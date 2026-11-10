@@ -20,7 +20,7 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Onboarding Wizard', href: '/onboarding', icon: ClipboardCheck },
   { name: 'Athlete Profile', href: '/profile', icon: User },
-  { name: 'AI Fitness Coach', href: '/ai-coach', icon: Bot },
+  { name: 'FitMind AI Coach', href: '/ai-coach', icon: Bot },
   { name: 'Workout Planner & Logger', href: '/workout', icon: Dumbbell },
   { name: 'Exercise Library', href: '/exercises', icon: BookOpen },
   { name: 'Nutrition & Food Tracker', href: '/nutrition', icon: Utensils },
@@ -59,9 +59,11 @@ export default function Sidebar() {
       </div>
 
       <div className="p-3 bg-gray-900/60 border border-gray-800/80 rounded-xl text-xs text-gray-400 space-y-1 mt-6">
-        <div className="font-semibold text-gray-300">Authoritative State Engine</div>
-        <div>8 AI Specialists Active</div>
-        <div className="text-brand-500">INR (₹) & Validated Macros</div>
+        <div className="font-bold text-white tracking-wide">FITMIND AI</div>
+        <div className="text-[10px] font-semibold text-brand-500 uppercase tracking-wider">
+          Intelligent Fitness. Science-Driven Results.
+        </div>
+        <div className="text-[11px] text-gray-400 pt-1">8 Specialists • INR (₹) &amp; Validated Macros</div>
       </div>
     </aside>
   );

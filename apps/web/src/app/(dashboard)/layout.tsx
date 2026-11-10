@@ -44,7 +44,15 @@ export default function DashboardLayout({
       <Navbar user={user} />
       <div className="flex flex-1">
         <Sidebar />
-        <main className="flex-1 p-8 overflow-y-auto max-w-7xl">{children}</main>
+        <div className="flex-1 flex flex-col overflow-y-auto">
+          <main className="flex-1 p-8 max-w-7xl w-full">{children}</main>
+          <footer className="border-t border-gray-800/80 px-8 py-4 text-xs text-gray-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <span className="font-semibold text-gray-400">FITMIND AI &copy; 2026</span>
+            <span className="text-brand-500 font-semibold tracking-wider uppercase text-[11px]">
+              INTELLIGENT FITNESS. SCIENCE-DRIVEN RESULTS.
+            </span>
+          </footer>
+        </div>
       </div>
     </div>
   );

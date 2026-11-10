@@ -15,9 +15,9 @@ export default function SettingsPage() {
   return (
     <div className="space-y-8 max-w-4xl">
       <div>
-        <h1 className="text-2xl font-bold text-white">Account, Security & AI Audit Settings</h1>
+        <h1 className="text-2xl font-bold text-white">FITMIND AI Account, Security &amp; Audit Settings</h1>
         <p className="text-sm text-gray-400">
-          Manage security, tenant isolation rules, currency preferences, and inspect AI execution audit trails
+          Intelligent Fitness. Science-Driven Results. • Manage security, tenant isolation rules, currency preferences, and inspect AI execution audit trails
         </p>
       </div>
 

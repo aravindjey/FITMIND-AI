@@ -1,4 +1,6 @@
-# AI Fitness Coach
+# FITMIND AI
+
+> **INTELLIGENT FITNESS. SCIENCE-DRIVEN RESULTS.**
 
 Production-grade, database-authoritative, AI-powered personalized Fitness & Athletic Coaching Platform built with **Next.js 14**, **FastAPI**, **SQLAlchemy 2.x Async**, **Alembic**, and a **Hub-and-Spoke Multi-Agent AI Architecture**.
 

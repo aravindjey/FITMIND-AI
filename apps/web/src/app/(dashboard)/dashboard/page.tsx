@@ -100,9 +100,9 @@ export default function DashboardPage() {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Athlete Command Center</h1>
+          <h1 className="text-2xl font-bold text-white">FITMIND AI Command Center</h1>
           <p className="text-sm text-gray-400">
-            Authoritative database state • Goal:{' '}
+            Intelligent Fitness. Science-Driven Results. • Goal:{' '}
             <span className="text-brand-400 font-medium capitalize">
               {(summary.primary_goal || 'general_fitness').replace('_', ' ')}
             </span>
@@ -121,7 +121,7 @@ export default function DashboardPage() {
             className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-xs font-semibold text-white flex items-center gap-2 transition-colors"
           >
             <Bot className="w-4 h-4" />
-            <span>Ask AI Coach</span>
+            <span>Ask FitMind AI</span>
           </Link>
         </div>
       </div>

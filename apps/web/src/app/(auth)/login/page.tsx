@@ -38,8 +38,10 @@ export default function LoginPage() {
             <div className="w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-500 mx-auto mb-3">
               <Activity className="w-6 h-6" />
             </div>
-            <h2 className="text-2xl font-bold text-white">Athlete Login</h2>
-            <p className="text-sm text-gray-400 mt-1">Access your persistent athletic dashboard</p>
+            <h2 className="text-2xl font-bold text-white">FITMIND AI Login</h2>
+            <p className="text-xs font-semibold text-brand-500 uppercase tracking-wider mt-1">
+              Intelligent Fitness. Science-Driven Results.
+            </p>
           </div>
 
           {error && (

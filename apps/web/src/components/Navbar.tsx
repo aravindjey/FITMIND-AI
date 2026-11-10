@@ -23,8 +23,10 @@ export default function Navbar({ user }: NavbarProps) {
           <Activity className="w-6 h-6" />
         </div>
         <div>
-          <span className="font-bold text-lg text-white tracking-tight">AI FITNESS COACH</span>
-          <span className="block text-xs text-brand-500 font-semibold tracking-wider">ATHLETIC PLATFORM</span>
+          <span className="font-bold text-lg text-white tracking-tight">FITMIND AI</span>
+          <span className="block text-[10px] text-brand-500 font-semibold tracking-wider uppercase">
+            INTELLIGENT FITNESS. SCIENCE-DRIVEN RESULTS.
+          </span>
         </div>
       </Link>
 

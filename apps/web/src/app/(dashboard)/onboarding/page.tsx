@@ -94,9 +94,9 @@ export default function OnboardingPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-white">Comprehensive Athlete Onboarding</h1>
+        <h1 className="text-2xl font-bold text-white">FITMIND AI Athlete Onboarding</h1>
         <p className="text-sm text-gray-400">
-          Establish your authoritative biometric baseline, equipment setup, and real-world Indian / global dietary preferences before generating training or nutrition plans.
+          Intelligent Fitness. Science-Driven Results. Establish your authoritative biometric baseline, equipment setup, and real-world Indian / global dietary preferences.
         </p>
       </div>
 

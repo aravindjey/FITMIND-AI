@@ -100,8 +100,10 @@ export default function ProfilePage() {
   return (
     <div className="space-y-8 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-bold text-white">Athlete Profile</h1>
-        <p className="text-sm text-gray-400">Authoritative athlete baseline metrics and goals</p>
+        <h1 className="text-2xl font-bold text-white">FITMIND AI Athlete Profile</h1>
+        <p className="text-sm text-gray-400">
+          Intelligent Fitness. Science-Driven Results. • Authoritative athlete baseline metrics and goals
+        </p>
       </div>
 
       {success && (

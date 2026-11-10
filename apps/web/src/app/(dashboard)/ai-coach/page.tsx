@@ -20,7 +20,7 @@ export default function AICoachPage() {
     {
       role: 'coach',
       message:
-        'Welcome to your Hub-and-Spoke AI Coaching Console. Every response I generate is grounded directly in your authoritative PostgreSQL/SQLite athlete state—your current weight, 7-day EMA trend, active workout split, INR food budget, and recovery readiness score.',
+        'Welcome to your FITMIND AI Hub-and-Spoke Coaching Console — Intelligent Fitness, Science-Driven Results. Every response I generate is grounded directly in your authoritative PostgreSQL/SQLite athlete state: your current weight, 7-day EMA trend, active workout split, INR food budget, and recovery readiness score.',
       targetSpokes: ['CoachOrchestrator', 'AthleteStateHydrator'],
       referencedMetrics: ['Database-Backed Context Active'],
     },
@@ -77,9 +77,9 @@ export default function AICoachPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">AI Fitness Coach & Multi-Agent Orchestrator</h1>
+          <h1 className="text-2xl font-bold text-white">FITMIND AI Coach &amp; Multi-Agent Orchestrator</h1>
           <p className="text-sm text-gray-400">
-            Zero-hallucination coaching hydrated from authoritative athlete database records
+            Intelligent Fitness. Science-Driven Results. • Zero-hallucination coaching hydrated from authoritative database records
           </p>
         </div>
         {state?.has_profile && (

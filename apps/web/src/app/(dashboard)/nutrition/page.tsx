@@ -110,9 +110,9 @@ export default function NutritionPage() {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Nutrition Planner & Food Tracker</h1>
+          <h1 className="text-2xl font-bold text-white">FITMIND AI Nutrition Planner &amp; Food Tracker</h1>
           <p className="text-sm text-gray-400">
-            Mifflin-St Jeor deterministic targets, Indian staple meal synthesis, and raw/cooked gram logging
+            Intelligent Fitness. Science-Driven Results. • Mifflin-St Jeor deterministic targets, Indian staple meal synthesis, and raw/cooked gram logging
           </p>
         </div>
         <button

@@ -12,18 +12,18 @@ export default function LandingPage() {
       <main className="flex-1 max-w-6xl mx-auto px-6 py-20 flex flex-col items-center justify-center text-center">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-500 text-xs font-semibold uppercase tracking-wider mb-8">
           <Activity className="w-3.5 h-3.5" />
-          <span>Persistent Athletic Platform</span>
+          <span>FITMIND AI • INTELLIGENT FITNESS. SCIENCE-DRIVEN RESULTS.</span>
         </div>
 
         <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-tight max-w-4xl mb-6">
-          Real Sports Science. <br />
+          FITMIND AI <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-emerald-300">
-            Authoritative State. Persistent Coaching.
+            Intelligent Fitness. Science-Driven Results.
           </span>
         </h1>
 
         <p className="text-lg md:text-xl text-gray-400 max-w-2xl mb-10 leading-relaxed">
-          Not another ChatGPT wrapper. A production-grade multi-agent athletic platform that combines deterministic scientific math with persistent database state.
+          Not another ChatGPT wrapper. FitMind AI is a production-grade multi-agent athletic coaching platform combining deterministic sports-science math with persistent database state.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center gap-4">
@@ -77,7 +77,7 @@ export default function LandingPage() {
       </main>
 
       <footer className="border-t border-gray-800 py-6 text-center text-xs text-gray-500">
-        AI Fitness Coach Platform &copy; 2026. Built with Next.js, FastAPI & PostgreSQL.
+        FITMIND AI &copy; 2026 — INTELLIGENT FITNESS. SCIENCE-DRIVEN RESULTS. Built with Next.js, FastAPI &amp; PostgreSQL.
       </footer>
     </div>
   );

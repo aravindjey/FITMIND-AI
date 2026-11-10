@@ -149,9 +149,9 @@ export default function WorkoutPage() {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Workout Planner & Performance Logger</h1>
+          <h1 className="text-2xl font-bold text-white">FITMIND AI Workout Planner &amp; Performance Logger</h1>
           <p className="text-sm text-gray-400">
-            Periodized split generation, set-by-set RPE logging, and deterministic progressive overload
+            Intelligent Fitness. Science-Driven Results. • Periodized split generation, set-by-set RPE logging, and deterministic progressive overload
           </p>
         </div>
         <button
