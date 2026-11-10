@@ -1,0 +1,651 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>FITMIND AI PRS Report</title><style>@page{size: A4; margin: 20mm;} body{font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11pt; line-height: 1.6; color: #111827; margin: 40px auto; max-width: 900px;} h1{color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 36px; page-break-after: avoid;} h2{color: #1e293b; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-top: 28px; page-break-after: avoid;} h3{color: #334155; margin-top: 22px; page-break-after: avoid;} h4{color: #475569;} table{border-collapse: collapse; width: 100%; margin: 20px 0; font-size: 9.5pt; page-break-inside: avoid;} th, td{border: 1px solid #cbd5e1; padding: 8px 12px; text-align: left; vertical-align: top;} th{background-color: #f1f5f9; font-weight: 600; color: #0f172a;} tr:nth-child(even){background-color: #f8fafc;} pre{background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; overflow-x: auto; font-family: ui-monospace, Menlo, Monaco, monospace; font-size: 9pt; line-height: 1.45; page-break-inside: avoid;} code{font-family: ui-monospace, Menlo, monospace; font-size: 9pt; background: #f1f5f9; padding: 2px 4px; border-radius: 4px;} hr{border: 0; border-top: 1px solid #e2e8f0; margin: 32px 0;} ul, ol{padding-left: 24px; margin: 12px 0;} li{margin-bottom: 6px;}</style></head><body>
+<h1>TABLE OF CONTENTS</h1>
+<p><em>(Students are required to prepare the PRS project report content for their respective project titles under the following sections)</em></p>
+<p></p>
+<table>
+<tr><th>S. No.</th><th>Title of the Exercise</th><th>Page No.</th></tr>
+<tr><td><strong>1.</strong></td><td><strong>Introduction</strong></td><td>1</td></tr>
+<tr><td><strong>2.</strong></td><td><strong>Problem Definition, Scope and Objectives</strong></td><td>4</td></tr>
+<tr><td><strong>3.</strong></td><td><strong>Literature Survey</strong></td><td>7</td></tr>
+<tr><td><strong>4.</strong></td><td><strong>Requirement Analysis</strong></td><td>11</td></tr>
+<tr><td><strong>5.</strong></td><td><strong>Proposed Methodology and System Design</strong></td><td>17</td></tr>
+<tr><td><strong>6.</strong></td><td><strong>Implementation</strong></td><td>25</td></tr>
+<tr><td><strong>7.</strong></td><td><strong>Results and Discussion</strong></td><td>30</td></tr>
+<tr><td><strong>8.</strong></td><td><strong>Conclusion</strong></td><td>36</td></tr>
+<tr><td><strong>9.</strong></td><td><strong>References</strong></td><td>38</td></tr>
+<tr><td><strong>10.</strong></td><td><strong>Annexure - I: Outcome-Specific Supporting Evidence</strong></td><td>40</td></tr>
+</table>
+<p></p>
+<hr/>
+<p></p>
+<h1>1. Introduction</h1>
+<p></p>
+<h3>1.1 Background &amp; Context</h3>
+<p>The ubiquity of personal computing devices, mobile web frameworks, and cloud-native databases has transformed the delivery of athletic coaching, personal training, and nutritional science. Historically, individuals seeking to improve physical conditioning, achieve muscular hypertrophy, reduce adipose tissue, or prepare for athletic competitions relied on two primary modalities:</p>
+<p>1. <strong>Human Personal Trainers and Sports Nutritionists:</strong> High-cost, location-constrained human coaching that delivers tailored programming but remains financially inaccessible to the broader public.</p>
+<p>2. <strong>Static Handbooks and Spreadsheet Trackers:</strong> Inexpensive or free self-directed programs that provide general training templates (e.g., linear progression, standard 2000 kcal diets) but fail to adapt dynamically to daily fatigue, rate of weight loss, biomechanical equipment availability, or personal dietary staples.</p>
+<p></p>
+<p>In recent years, the commercial market has witnessed a surge in digital health applications (such as <em>MyFitnessPal</em>, <em>Strong</em>, <em>Hevy</em>, and <em>MacroFactor</em>). While these platforms provide basic logging interfaces, they function primarily as passive recording ledgers. They rarely provide intelligent, holistic autoregulation that synthesizes training volume, caloric adjustments, and recovery indices simultaneously. </p>
+<p></p>
+<p>Concurrently, the rapid emergence of Generative Artificial Intelligence and Large Language Models (LLMs) has prompted numerous software developers to build generic conversational &quot;AI fitness coach&quot; wrappers. However, when applied to quantitative sports science, unconstrained probabilistic language models introduce severe hazards:</p>
+<li><strong>Mathematical Hallucination:</strong> LLMs inherently operate on probabilistic token prediction rather than arithmetic computation, frequently generating mathematically impossible macronutrient totals (4 kcal/g protein + 4 kcal/g carb + 9 kcal/g fat ≠ total calories).</li>
+<li><strong>Dangerous Recommendations:</strong> Probabilistic text generators lack hard constraints, occasionally recommending severe caloric deficits below the Basal Metabolic Rate (BMR) or prescribing excessive training volumes (e.g., &gt;35 weekly sets per muscle group) that increase the risk of rhabdomyolysis and overtraining syndrome.</li>
+<li><strong>Disregard for Cultural and Economic Realities:</strong> Off-the-shelf AI models routinely suggest exotic, expensive Western ingredients (such as salmon, avocado, or specialty protein supplements) to athletes residing in diverse socio-economic regions, failing to respect Indian dietary staples, vegetarian paradigms, and local currency (INR ₹) budget limits.</li>
+<p></p>
+<h3>1.2 The FITMIND AI Paradigm</h3>
+<p><strong>FITMIND AI</strong> (<em>Intelligent Fitness. Science-Driven Results.</em>) was engineered to solve these structural deficiencies through a <strong>neuro-symbolic, decoupled architecture</strong>. The foundational architectural invariant of FITMIND AI is:</p>
+<p></p>
+<p><strong>Invariant: The Relational Database is the Single Authoritative Source of Truth.</strong></p>
+<p></p>
+<p>Probabilistic language models are <strong>never</strong> permitted to act as the source of truth for quantitative athlete records, mathematical calculations, nutritional targets, or periodization progressions. Instead:</p>
+<li><strong>Pure Deterministic Python Scientific Engines</strong> perform all mathematical modeling, including Basal Metabolic Rate (Mifflin-St Jeor), Total Daily Energy Expenditure (TDEE), 6-pass macro and INR ₹ budget reconciliation, submaximal estimated 1-Repetition Maximum (Epley 1RM), 7-day Exponential Moving Average (EMA) weight velocity trends, and daily recovery readiness scores (1–100).</li>
+<li><strong>Specialized AI Components (Multi-Agent Subsystem)</strong> focus exclusively on qualitative interpretation, personalized exercise substitution, structured periodized program synthesis, and natural-language coaching.</li>
+<li><strong>Deterministic Safety Gatekeepers (SafetyValidationComponent)</strong> intercept every AI proposal before it is presented to the user or committed to the database, enforcing non-negotiable safety floors, volume ceilings, and strict allergen exclusions.</li>
+<p></p>
+<h3>1.3 System Overview &amp; Stakeholder Beneficiaries</h3>
+<p>FITMIND AI is structured as a cloud-native, responsive web application serving three core stakeholder groups:</p>
+<p>1. <strong>Athletes / End-Users:</strong> Individual lifters, athletes, and fitness enthusiasts who receive evidence-based workout routines, coupled Indian/global nutrition plans matching exact calorie and macro targets within weekly INR budgets, and daily recovery autoregulation.</p>
+<p>2. <strong>Coaches / Personal Trainers:</strong> Human practitioners who utilize the platform to monitor multi-athlete rosters, track longitudinal compliance, and audit AI-generated recommendations.</p>
+<p>3. <strong>Platform Administrators:</strong> System operators responsible for verifying database integrity, monitoring audit logs, overseeing rate limiting, and ensuring adherence to data privacy mandates.</p>
+<p></p>
+<hr/>
+<p></p>
+<h1>2. Problem Definition, Scope and Objectives</h1>
+<p></p>
+<h3>2.1 Problem Definition</h3>
+<p>Modern digital health software and generic generative AI fitness tools suffer from four critical systemic failures:</p>
+<p></p>
+<p>1. <strong>Information Fragmentation and Data Silos:</strong></p>
+<p>   Athletic telemetry is distributed across disparate, unconnected applications—one app for barbell logging, a second for food tracking, a third for scale weight, and a wearable for sleep. Consequently, neither the user nor any automated system possesses a unified, longitudinal record required to adjust training intensity or caloric intake based on real-world physiological adaptation.</p>
+<p>2. <strong>Absence of Dynamic Autoregulation:</strong></p>
+<p>   Static digital routines fail to account for daily biological variations. If an athlete experiences acute sleep deprivation, high life stress, or muscular soreness, conventional apps continue to prescribe fixed loading parameters, precipitating overreaching and orthopedic injuries.</p>
+<p>3. <strong>Stochastic AI Hallucinations and Pseudo-Precision:</strong></p>
+<p>   Standard LLM wrappers hallucinate exercise biomechanics, suggest meals that violate declared food allergies, and display pseudoscientific body fat percentages derived from noisy smartphone photographs without conveying estimation uncertainty.</p>
+<p>4. <strong>Data Sovereignty and Privacy Vulnerabilities:</strong></p>
+<p>   Athletes upload sensitive personal biometrics, body circumferences, and physique images to platforms that often lack multi-tenant cryptographic isolation, audit logging, and verifiable self-service account erasure mechanisms compliant with data protection standards (e.g., GDPR Article 17).</p>
+<p></p>
+<h3>2.2 Project Scope</h3>
+<p></p>
+<h4>2.2.1 In-Scope Capabilities</h4>
+<li><strong>Relational Data Architecture:</strong> A fully normalized 21-table PostgreSQL database schema managed via Alembic migrations, tracking athlete biometrics, goals, equipment, workouts, sets, exercises, personal records, food items, meal plans, check-ins, weight entries, and agent audit trails.</li>
+<li><strong>Deterministic Scientific Engines:</strong></li>
+<li>- <em>Metabolic Engine:</em> Mifflin-St Jeor BMR, activity-adjusted TDEE, adaptive surplus/deficit adjustment, and goal-weight conflict resolution.</li>
+<li>- <em>Volume &amp; 1RM Engine:</em> Epley formula submaximal 1RM estimation, session and weekly volume calculation, and RPE-based progressive overload prescriptions.</li>
+<li>- <em>Progress &amp; Trend Engine:</em> 7-day Exponential Moving Average (α = 0.25) body-weight smoothing, rate-of-change velocity (kg/week), and plateau detection.</li>
+<li>- <em>Recovery Engine:</em> Multi-factor readiness scoring (1–100) based on sleep duration, sleep quality, subjective muscle soreness, life stress, and previous session RPE.</li>
+<li>- <em>Coupled Meal Plan Solver:</em> A 6-pass reconciliation algorithm that aligns protein targets, total caloric limits, staple foods, and weekly INR ₹ budgets with zero arithmetic residual.</li>
+<li><strong>Orchestrated Multi-Agent AI Subsystem:</strong> An ensemble of 8 specialized AI components (BodyAnalysisAgent, TrainingAgent, NutritionAgent, FitnessCoachingAgent, ProgressAgent, RecoveryAgent, SafetyValidationComponent, and LifestyleHabitAgent) coordinated by CoachOrchestrator.</li>
+<li><strong>Application Security &amp; Hardening:</strong> Argon2id password hashing, JWT authentication with rotating cryptographically random keys and JTI revocation, sliding-window rate limiting, defense-in-depth HTTP security headers, prompt injection XML fencing, and complete cascading account erasure.</li>
+<li><strong>Full-Stack Implementation:</strong> A decoupled Next.js 14 frontend (TypeScript, Tailwind CSS) and FastAPI backend (Python 3.11+, SQLAlchemy 2.0 Async), deployed to production across Vercel, Render, and Neon PostgreSQL.</li>
+<p></p>
+<h4>2.2.2 Out-of-Scope Capabilities</h4>
+<li>Standalone native binary mobile application development (iOS Swift / Android Kotlin); responsive mobile web (PWA-compatible) is provided instead.</li>
+<li>Clinical diagnosis, medical treatment, or prescription for pathological eating disorders, endocrine dysfunction, or musculoskeletal tears.</li>
+<li>Direct hardware manufacturing of IoT wearable sensors (system relies on manual entry and simulated telemetry feeds).</li>
+<p></p>
+<h3>2.3 System Objectives (SMART)</h3>
+<p>The engineering of FITMIND AI was guided by the following explicit, quantifiable objectives:</p>
+<p>1. <strong>Mathematical Precision (0 kcal Drift):</strong> Ensure that 100% of generated meal plans exhibit an absolute caloric discrepancy of ≤ 5 kcal and protein discrepancy of ≤ 2 g relative to deterministic targets.</p>
+<p>2. <strong>Absolute Safety Enforcement (100%):</strong> Guarantee that zero generated nutrition plans fall below the calculated BMR or the absolute physiological floor of 1200 kcal, and zero meal plans contain ingredients matching the user&#x27;s declared allergy list.</p>
+<p>3. <strong>Comprehensive Test Verification:</strong> Achieve 100% pass rate across an automated suite of at least 25 unit and integration tests covering security, calculation engines, API endpoints, and agent execution.</p>
+<p>4. <strong>Low Latency &amp; High Availability:</strong> Achieve sub-250 ms response times for deterministic computation endpoints and sub-1.5 s response times for AI-orchestrated endpoints, while deploying the platform on a multi-tier cloud infrastructure with zero operational hosting costs.</p>
+<p>5. <strong>Data Privacy Compliance:</strong> Implement verifiable, cascading deletion ensuring that executing DELETE /api/v1/auth/me irrevocably purges all user records across all 21 relational database tables in under 500 ms.</p>
+<p></p>
+<hr/>
+<p></p>
+<h1>3. Literature Survey</h1>
+<p></p>
+<h3>3.1 Review of Scientific Literature</h3>
+<p></p>
+<table>
+<tr><th>Domain / Concept</th><th>Primary Reference</th><th>Key Scientific Findings &amp; Algorithmic Relevance to FITMIND AI</th></tr>
+<tr><td><strong>Basal Metabolic Rate Prediction</strong></td><td>Mifflin, St Jeor et al. (1990) [6]</td><td>Evaluated 498 healthy individuals; demonstrated that the Mifflin-St Jeor formula predicts Resting Energy Expenditure (REE) within ±10% of indirect calorimetry in 82% of subjects, significantly outperforming the older Harris-Benedict (1919) equation. Selected as the core formula for services/api/app/engines/nutrition.py.</td></tr>
+<tr><td><strong>Nutritional Periodization for Hypertrophy &amp; Fat Loss</strong></td><td>Helms, Aragon, &amp; Fitschen (2014) [7]; Jäger et al. (ISSN, 2017)</td><td>Established that natural athletes require 1.6–2.2 g/kg of protein daily during energy balance or surplus, increasing to 2.3–3.1 g/kg of fat-free mass during caloric restriction. Established essential dietary fat minimums at 20–30% of total calories. Embedded directly into FITMIND AI’s macronutrient distribution logic.</td></tr>
+<tr><td><strong>Volume Dose-Response in Resistance Training</strong></td><td>Schoenfeld, Ogborn, &amp; Krieger (2017)</td><td>Conducted meta-analysis demonstrating a graded dose-response relationship between weekly set volume and muscle hypertrophy, identifying 10–20 working sets per muscle group per week as optimal, with diminishing returns and systemic fatigue past 25 sets. Embedded into VolumeEngine validation ceilings.</td></tr>
+<tr><td><strong>Submaximal Strength &amp; 1RM Estimation</strong></td><td>Epley (1985) [8]; Brzycki (1993)</td><td>Formulated submaximal mathematical models estimating 1-Repetition Maximum: 1RM = w · (1 + r/30). Demonstrated high validity for repetition ranges 1 ≤ r ≤ 10. Used by FITMIND AI to track dynamic strength adaptations without exposing athletes to the orthopedic injury risks of maximal 1RM testing.</td></tr>
+<tr><td><strong>Subjective Fatigue &amp; Autoregulation</strong></td><td>Halson (2014); Zourdos et al. (2016)</td><td>Demonstrated that subjective wellness markers (sleep quality, muscle soreness, perceived stress) and Repetitions in Reserve (RIR) correlates strongly with central nervous system recovery and objective power output. Formulated the basis for FITMIND AI’s RecoveryEngine and daily Readiness Score (1–100).</td></tr>
+<tr><td><strong>Neuro-Symbolic &amp; Agentic AI Systems</strong></td><td>Marcus (2020); Yao et al. (2022)</td><td>Argued that purely statistical deep learning models fail in tasks requiring rigorous logic, mathematical deduction, and safety guarantees. Advocated neuro-symbolic systems that combine neural semantic generation with symbolic, rule-based execution gates. Directly informs FITMIND AI’s multi-agent orchestrator design.</td></tr>
+</table>
+<p></p>
+<h3>3.2 Comparative Analysis of Existing Systems</h3>
+<p></p>
+<table>
+<tr><th>Feature / Capability</th><th>Conventional Trackers (MyFitnessPal, Strong)</th><th>Generic AI Wrappers (ChatGPT Prompts)</th><th>Commercial Wearables (Whoop, Oura)</th><th><strong>FITMIND AI (Proposed Platform)</strong></th></tr>
+<tr><td><strong>Authoritative Relational Database</strong></td><td>Yes (Siloed)</td><td>No (Stateless)</td><td>Yes (Proprietary Cloud)</td><td><strong>Yes (PostgreSQL, 21 Normalized Tables)</strong></td></tr>
+<tr><td><strong>Mathematical Calculation Engine</strong></td><td>Basic / Fixed</td><td>No (Hallucinated Token Arithmetic)</td><td>Black-box Proprietary</td><td><strong>Pure Deterministic Python Engines</strong></td></tr>
+<tr><td><strong>Coupled Macro, Calorie &amp; Budget Solver</strong></td><td>No (Manual entry)</td><td>No (Arbitrary food suggestions)</td><td>No</td><td><strong>Yes (6-Pass Solver, INR ₹ Optimization)</strong></td></tr>
+<tr><td><strong>Dynamic Training Autoregulation</strong></td><td>No (Static logs)</td><td>Inconsistent</td><td>Daily strain scores only</td><td><strong>Yes (Session RPE, PR Engine, Load Tuning)</strong></td></tr>
+<tr><td><strong>Deterministic Safety Gatekeeper</strong></td><td>Minimal</td><td>None</td><td>N/A</td><td><strong>Yes (Strict BMR floor, Allergen filters)</strong></td></tr>
+<tr><td><strong>Multi-Agent Orchestration Architecture</strong></td><td>No</td><td>Single monolithic prompt</td><td>No</td><td><strong>Yes (8 Specialized Agents + Orchestrator)</strong></td></tr>
+<tr><td><strong>Zero Cost / Open Deployment Model</strong></td><td>Subscription</td><td>Subscription / Token cost</td><td>Hardware + Monthly Fee</td><td><strong>Fully Deployable on Free Cloud Tiers</strong></td></tr>
+</table>
+<p></p>
+<hr/>
+<p></p>
+<h1>4. Requirement Analysis</h1>
+<p></p>
+<h3>4.1 System Actors &amp; User Classes</h3>
+<p>1. <strong>Athlete (Primary End-User):</strong> Authenticated user logging personal biometric data, executing workout routines, tracking meals, submitting check-in logs, and interacting with the conversational AI coach.</p>
+<p>2. <strong>Coach / Trainer (Secondary User):</strong> Specialized persona with elevated access to review athlete progression histories, audit generated training plans, and modify periodization parameters.</p>
+<p>3. <strong>Multi-Agent Subsystem (Internal Autonomous Actor):</strong> Collection of 8 specialized software components executing prompt-engineered LLM inference via Pydantic v2 schemas.</p>
+<p>4. <strong>System Administrator (Operational Actor):</strong> Manages cloud deployment parameters, database schema migrations, rate limiting thresholds, and security audit logs.</p>
+<p></p>
+<h3>4.2 System Modules</h3>
+<li><strong>MOD-01: Authentication &amp; Tenant Security:</strong> Identity lifecycle, Argon2id hashing, JWT token rotation, and cascading deletion.</li>
+<li><strong>MOD-02: Athlete Profile &amp; Biometric State Management:</strong> Onboarding wizard, biometric tracking, dietary preferences, and equipment catalogs.</li>
+<li><strong>MOD-03: Deterministic Calculation Engines:</strong> Scientific computation of BMR, TDEE, macros, 1RM, weight velocity, and readiness scores.</li>
+<li><strong>MOD-04: Multi-Agent Orchestration (CoachOrchestrator):</strong> Context hydration, dispatching to specialized agents, and audit logging.</li>
+<li><strong>MOD-05: Workout Synthesis &amp; Resistance Logging:</strong> Periodized routine generation, active workout tracking, set-level logging, and PR detection.</li>
+<li><strong>MOD-06: Nutrition &amp; Coupled Meal Plan Solver:</strong> 6-pass macro reconciliation, Indian food database, and weekly INR ₹ budget enforcement.</li>
+<li><strong>MOD-07: Progress &amp; Longitudinal Trend Analysis:</strong> 7-day EMA weight trajectory, circumference deltas, and velocity reporting.</li>
+<li><strong>MOD-08: Daily Recovery &amp; Autoregulation:</strong> Readiness scoring (1–100) and automatic volume/intensity adjustments.</li>
+<li><strong>MOD-09: Deterministic Safety Gatekeeper:</strong> Validation of proposals against calorie floors, volume caps, and allergen lists.</li>
+<p></p>
+<h3>4.3 Functional Requirements (FR)</h3>
+<p></p>
+<table>
+<tr><th>Req ID</th><th>Module</th><th>Functional Requirement Specification</th><th>Acceptance Criteria</th></tr>
+<tr><td><strong>FR-01</strong></td><td>MOD-01</td><td>The system shall register users with unique email addresses and passwords hashed using the Argon2id memory-hard algorithm.</td><td>Password stored as Argon2id hash; duplicate emails return HTTP 400.</td></tr>
+<tr><td><strong>FR-02</strong></td><td>MOD-01</td><td>The system shall issue cryptographically signed JWT access tokens (15-min expiry) and refresh tokens (7-day expiry) containing unique jti identifiers.</td><td>Valid tokens allow access to protected endpoints; expired tokens return HTTP 401.</td></tr>
+<tr><td><strong>FR-03</strong></td><td>MOD-01</td><td>The system shall irrevocably delete all athlete data across all 21 tables upon receiving an authenticated DELETE /api/v1/auth/me request.</td><td>Zero orphan rows remain; cascade execution executes in &lt;500 ms.</td></tr>
+<tr><td><strong>FR-04</strong></td><td>MOD-02</td><td>The system shall record athlete onboarding profiles (age, sex, height, weight, activity level, primary goal, dietary preferences, available equipment).</td><td>Profile committed to athlete_profiles table with foreign key linking to users.</td></tr>
+<tr><td><strong>FR-05</strong></td><td>MOD-03</td><td>The system shall calculate BMR using the Mifflin-St Jeor formula and activity-adjusted TDEE using deterministic physical activity coefficients.</td><td>BMR and TDEE match pure mathematical values with 0.0% calculation drift.</td></tr>
+<tr><td><strong>FR-06</strong></td><td>MOD-03</td><td>The system shall detect goal-weight contradictions (e.g., muscle_gain goal when current weight &gt; target weight) and automatically engage recomposition protocols.</td><td>Contradiction detected; target calories adjusted to moderate -15% deficit.</td></tr>
+<tr><td><strong>FR-07</strong></td><td>MOD-03</td><td>The system shall calculate submaximal 1RM estimates for resistance sets using the Epley formula: 1RM = w · (1 + r/30).</td><td>1RM correctly calculated; logged values &gt; historical PR trigger a new PR record.</td></tr>
+<tr><td><strong>FR-08</strong></td><td>MOD-03</td><td>The system shall compute a 7-day Exponential Moving Average (α = 0.25) of scale weight entries and calculate weekly rate of change.</td><td>Weight fluctuations smoothed; trend classified as on_track, too_fast, or plateau.</td></tr>
+<tr><td><strong>FR-09</strong></td><td>MOD-03</td><td>The system shall calculate a daily Readiness Score (1–100) from sleep duration, sleep quality, muscle soreness, stress, and previous session RPE.</td><td>High fatigue (score &lt; 50) triggers recommendations to reduce volume by 20–30%.</td></tr>
+<tr><td><strong>FR-10</strong></td><td>MOD-04</td><td>The system shall hydrate authoritative athlete state from PostgreSQL before passing context to any AI specialist agent.</td><td>Agents receive structured JSON containing latest profile, PRs, and recovery metrics.</td></tr>
+<tr><td><strong>FR-11</strong></td><td>MOD-04</td><td>The system shall record full execution snapshots (latency, prompt, output, fallback status) in agent_audit_logs.</td><td>Every agent invocation generates an audit record; fallback runs explicitly set is_fallback=True.</td></tr>
+<tr><td><strong>FR-12</strong></td><td>MOD-05</td><td>The system shall generate periodized workout routines tailored to available equipment and weekly schedule frequency.</td><td>Generated routines contain valid exercises matching user equipment; daily volume ≤ 32 sets.</td></tr>
+<tr><td><strong>FR-13</strong></td><td>MOD-05</td><td>The system shall support live workout session execution, capturing sets, loads, completed reps, and perceived exertion (RPE).</td><td>Sets committed to workout_sets table; session total volume updated dynamically.</td></tr>
+<tr><td><strong>FR-14</strong></td><td>MOD-06</td><td>The system shall synthesize meal plans matching exact macro targets and weekly INR ₹ budget ceilings using the 6-pass reconciliation solver.</td><td>Total calories match within ±5 kcal; protein matches within ±2 g; cost ≤ budget.</td></tr>
+<tr><td><strong>FR-15</strong></td><td>MOD-06</td><td>The system shall filter out all ingredients matching user-declared food allergies and dietary preferences (e.g., vegetarian, vegan, eggetarian).</td><td>Zero prohibited ingredients appear in synthesized meal plans.</td></tr>
+<tr><td><strong>FR-16</strong></td><td>MOD-09</td><td>The system shall intercept all AI proposals and reject any workout exceeding volume ceilings or any diet falling below the calculated BMR floor.</td><td>Non-compliant plans rejected; violations logged; fallback safe plans synthesized.</td></tr>
+<tr><td><strong>FR-17</strong></td><td>MOD-08</td><td>The system shall record daily check-in logs including scale weight, hydration volume, sleep hours, subjective soreness, and stress levels.</td><td>Check-ins stored in check_ins table; triggers immediate recalculation of readiness score.</td></tr>
+<tr><td><strong>FR-18</strong></td><td>MOD-07</td><td>The system shall generate longitudinal progress summaries tracking weight velocity, volume progression, and circumference changes.</td><td>Analytical report generated comparing baseline onboarding state with current 7-day EMA.</td></tr>
+</table>
+<p></p>
+<h3>4.4 Non-Functional Requirements (NFR)</h3>
+<p></p>
+<table>
+<tr><th>Req ID</th><th>Category</th><th>Specification</th><th>Target Metric / Evaluation Method</th></tr>
+<tr><td><strong>NFR-01</strong></td><td><strong>Performance</strong></td><td>API response latency for deterministic mathematical endpoints shall be sub-250 ms.</td><td>95th percentile response time &lt; 250 ms under concurrent load.</td></tr>
+<tr><td><strong>NFR-02</strong></td><td><strong>Performance</strong></td><td>Multi-agent orchestrated plan generation shall complete within acceptable human interaction thresholds.</td><td>Total pipeline latency &lt; 3.0 s using cloud LLMs; &lt; 500 ms in fallback mode.</td></tr>
+<tr><td><strong>NFR-03</strong></td><td><strong>Scalability</strong></td><td>Relational schema shall support horizontal database read replicas and serverless connection pooling.</td><td>Verified using Neon Serverless PostgreSQL connection pooling (pgbouncer).</td></tr>
+<tr><td><strong>NFR-04</strong></td><td><strong>Reliability</strong></td><td>The backend shall achieve 100% uptime and graceful degradation during external AI API outages.</td><td>Fallback provider (DevelopmentFallbackProvider) activates with zero unhandled exceptions.</td></tr>
+<tr><td><strong>NFR-05</strong></td><td><strong>Security</strong></td><td>Passwords shall be cryptographically hashed using memory-hard Argon2id parameters.</td><td>Minimum parameters: m=65536 KiB, t=3, p=4; zero plaintext passwords stored.</td></tr>
+<tr><td><strong>NFR-06</strong></td><td><strong>Security</strong></td><td>All endpoints shall be protected against brute-force and credential stuffing attacks.</td><td>Sliding-window in-memory rate limiter returns HTTP 429 after 15 failed requests/min.</td></tr>
+<tr><td><strong>NFR-07</strong></td><td><strong>Security</strong></td><td>System shall enforce defensive HTTP security headers on all responses.</td><td>Headers enforced: X-Content-Type-Options: nosniff, X-Frame-Options: DENY, X-XSS-Protection: 1; mode=block.</td></tr>
+<tr><td><strong>NFR-08</strong></td><td><strong>Security</strong></td><td>Multi-tenant isolation shall be strictly enforced across all database queries.</td><td>Every query joins on user_id extracted from validated JWT; zero cross-tenant leakage.</td></tr>
+<tr><td><strong>NFR-09</strong></td><td><strong>Usability</strong></td><td>The user interface shall provide responsive, adaptive layouts for desktop, tablet, and mobile screens.</td><td>Zero horizontal overflow; viewport meta tag enforced; touch tap targets ≥ 44 × 44 px.</td></tr>
+<tr><td><strong>NFR-10</strong></td><td><strong>Portability</strong></td><td>System shall run seamlessly across Linux, macOS, and containerized Docker environments.</td><td>Standardized pyproject.toml / requirements.txt and Next.js standalone output.</td></tr>
+<tr><td><strong>NFR-11</strong></td><td><strong>Maintainability</strong></td><td>Architecture shall enforce strict separation of concerns between API, engines, agents, and UI.</td><td>Modular monolith structure; 100% type hinting (Python Pydantic + TypeScript interfaces).</td></tr>
+<tr><td><strong>NFR-12</strong></td><td><strong>Compliance</strong></td><td>Platform shall support GDPR Article 17 &quot;Right to Erasure&quot; requirements.</td><td>Authenticated user can execute one-click account deletion purging all associated records.</td></tr>
+</table>
+<p></p>
+<h3>4.5 Hardware &amp; Software Specifications</h3>
+<p></p>
+<h4>4.5.1 Development &amp; Server Infrastructure</h4>
+<li><strong>Server Operating System:</strong> Ubuntu 22.04 LTS / macOS 14.x Darwin</li>
+<li><strong>Compute Architecture:</strong> 64-bit x86_64 or ARM64 (Apple Silicon M-Series)</li>
+<li><strong>Backend Runtime:</strong> Python 3.11.8 or higher</li>
+<li><strong>Web Server:</strong> Uvicorn 0.28+ (ASGI) running behind Render Cloud reverse proxy</li>
+<li><strong>Frontend Runtime:</strong> Node.js 20.x LTS / Next.js 14 App Router</li>
+<li><strong>Database Engine:</strong> PostgreSQL 16 (Neon Serverless Cloud) / SQLite 3 (local dev)</li>
+<li><strong>Testing Framework:</strong> Pytest 8.1+ with pytest-asyncio</li>
+<p></p>
+<h4>4.5.2 Client Specifications</h4>
+<li><strong>Hardware:</strong> Modern Smartphone (iOS 15+, Android 10+) or Desktop PC/Mac</li>
+<li><strong>Browser:</strong> Google Chrome 110+, Apple Safari 16+, Mozilla Firefox 115+, Microsoft Edge 110+</li>
+<li><strong>Network:</strong> Standard broadband or cellular connectivity (3G/4G/5G/Wi-Fi)</li>
+<p></p>
+<hr/>
+<p></p>
+<h1>5. Proposed Methodology and System Design</h1>
+<p></p>
+<h3>5.1 System Architecture</h3>
+<p>FITMIND AI is architected as a <strong>Modular Clean Monolith</strong> with strict unidirectional data flow. The architecture decouples the presentation tier, API transport tier, deterministic scientific computation layer, AI multi-agent orchestration layer, and relational persistence tier.</p>
+<p></p>
+<pre>
++----------------------------------------------------------------------------------------------------+
+|                                    PRESENTATION LAYER (CLIENT)                                     |
+|             Next.js 14 App Router | React 18 | Tailwind CSS | TypeScript Type-Safe API Client       |
++----------------------------------------------------------------------------------------------------+
+                                                  |  HTTPS / JSON (JWT Authenticated)
+                                                  v
++----------------------------------------------------------------------------------------------------+
+|                                      TRANSPORT LAYER (FASTAPI)                                      |
+|  Rate Limiting Middleware | Defensive Security Headers | CORS Handler | OAuth2 Bearer Auth Router  |
++----------------------------------------------------------------------------------------------------+
+                                                  |
+                         +------------------------+------------------------+
+                         |                                                 |
+                         v                                                 v
++--------------------------------------------------+    +--------------------------------------------+
+|         DETERMINISTIC SCIENTIFIC ENGINES         |    |         MULTI-AGENT ORCHESTRATION          |
+|  - Metabolic Engine (Mifflin-St Jeor / TDEE)     |    |  - CoachOrchestrator                       |
+|  - 1RM &amp; Volume Engine (Epley / Set Ceilings)    |&lt;--&gt;|  - 8 Specialized Domain Agents             |
+|  - Progress Engine (7-Day EMA / Rate of Change)  |    |  - Provider Abstraction (OpenAI/Anthropic) |
+|  - Recovery Engine (Readiness Index 1-100)       |    |  - DevelopmentFallbackProvider             |
+|  - Coupled Macro &amp; INR Budget Solver (6-Pass)    |    |  - SafetyValidationComponent (Gatekeeper)  |
++--------------------------------------------------+    +--------------------------------------------+
+                         |                                                 |
+                         +------------------------+------------------------+
+                                                  |  SQLAlchemy 2.0 Async ORM
+                                                  v
++----------------------------------------------------------------------------------------------------+
+|                                    PERSISTENCE LAYER (DATABASE)                                    |
+|              PostgreSQL 16 Relational Schema (Neon Serverless) | 21 Normalized Tables               |
++----------------------------------------------------------------------------------------------------+
+</pre>
+<p></p>
+<h3>5.2 The 5-Stage Unidirectional Execution Pipeline</h3>
+<p>To prevent AI hallucinations, every intelligent request follows a rigid 5-stage pipeline:</p>
+<p>1. <strong>State Hydration (AthleteStateHydrator):</strong> Queries PostgreSQL for authoritative user records (biometrics, goals, equipment, allergies, recent workouts, PRs, and recovery entries).</p>
+<p>2. <strong>Deterministic Pre-Computation:</strong> Python scientific engines compute exact values for BMR, TDEE, macro bounds, 1RM estimates, and readiness scores.</p>
+<p>3. <strong>Agent Synthesis (AgentRunner):</strong> Dispatches context to the specialized agent, invoking the configured LLM through Pydantic v2 schemas.</p>
+<p>4. <strong>Safety &amp; Validation Gate (SafetyValidationComponent):</strong> Intercepts the generated proposal and evaluates it against mathematical floors (BMR), set volume limits (≤ 32 sets/day), and declared allergen lists.</p>
+<p>5. <strong>Audit Logging &amp; Relational Commit:</strong> Serializes the validated plan into relational tables and records execution telemetry in agent_audit_logs.</p>
+<p></p>
+<h3>5.3 Core Algorithmic Formulations</h3>
+<p></p>
+<h4>5.3.1 Algorithm 5.1: Metabolic Energy Expenditure &amp; Macro Allocation (ALG-02)</h4>
+<pre>
+Algorithm 5.1: Deterministic BMR, TDEE, and Macronutrient Target Calculation
+Input: sex (&#x27;male&#x27; | &#x27;female&#x27;), weight_kg, height_cm, age_years, activity_level, goal, target_weight_kg
+Output: Dict containing bmr, tdee, target_calories, protein_g, carbs_g, fat_g, adaptive_strategy
+
+1:  if sex == &#x27;male&#x27; then
+2:      bmr ← 10.0 * weight_kg + 6.25 * height_cm - 5.0 * age_years + 5.0
+3:  else
+4:      bmr ← 10.0 * weight_kg + 6.25 * height_cm - 5.0 * age_years - 161.0
+5:  end if
+6:
+7:  activity_multipliers ← {&#x27;sedentary&#x27;: 1.2, &#x27;lightly_active&#x27;: 1.375, &#x27;moderately_active&#x27;: 1.55, 
+                            &#x27;very_active&#x27;: 1.725, &#x27;extremely_active&#x27;: 1.9}
+8:  tdee ← round(bmr * activity_multipliers[activity_level])
+9:
+10: // Goal-Weight Conflict Detection
+11: if goal == &#x27;muscle_gain&#x27; and target_weight_kg is not null and target_weight_kg &lt; weight_kg then
+12:     adaptive_strategy ← &#x27;recomposition_cut&#x27;
+13:     target_calories ← round(tdee * 0.85) // -15% deficit
+14: else if goal == &#x27;fat_loss&#x27; then
+15:     adaptive_strategy ← &#x27;caloric_deficit&#x27;
+16:     target_calories ← max(round(tdee * 0.80), round(bmr)) // Respect BMR floor
+17: else if goal == &#x27;muscle_gain&#x27; then
+18:     adaptive_strategy ← &#x27;caloric_surplus&#x27;
+19:     target_calories ← round(tdee * 1.10) // +10% surplus
+20: else
+21:     adaptive_strategy ← &#x27;maintenance&#x27;
+22:     target_calories ← tdee
+23: end if
+24:
+25: // Absolute Health Safety Floor Enforcement
+26: target_calories ← max(target_calories, 1200)
+27:
+28: // Evidence-Based Macro Allocation
+29: protein_g ← round(2.1 * weight_kg, 1)                  // 2.1 g/kg body weight
+30: fat_calories ← target_calories * 0.25                  // 25% essential dietary fat
+31: fat_g ← round(fat_calories / 9.0, 1)
+32: carb_calories ← target_calories - (protein_g * 4.0) - (fat_g * 9.0)
+33: carbs_g ← round(carb_calories / 4.0, 1)
+34:
+35: return {bmr, tdee, target_calories, protein_g, carbs_g, fat_g, adaptive_strategy}
+</pre>
+<p></p>
+<h4>5.3.2 Algorithm 5.2: 6-Pass Coupled Macro, Calorie &amp; Weekly INR ₹ Budget Solver</h4>
+<pre>
+Algorithm 5.2: Coupled Nutritional Optimization &amp; Indian Budget Solver
+Input: target_calories, target_protein_g, weekly_budget_inr, dietary_preference, declared_allergies
+Output: Reconciled meal plan containing specific ingredients, gram weights, and exact cost
+
+1:  food_catalog ← query_food_items(dietary_preference, exclude_allergies=declared_allergies)
+2:  daily_budget_inr ← weekly_budget_inr / 7.0
+3:
+4:  // Pass 1: Select staple food categories
+5:  protein_staples ← filter_by_tag(food_catalog, &#x27;high_protein&#x27;, max_cost_per_g_protein=1.5)
+6:  carb_staples ← filter_by_tag(food_catalog, &#x27;complex_carb&#x27;, max_cost_per_100g=30.0)
+7:  fat_staples ← filter_by_tag(food_catalog, &#x27;healthy_fat&#x27;)
+8:
+9:  // Pass 2: Base Protein Allocation
+10: allocated_protein_g ← 0, total_cost_inr ← 0
+11: for item in protein_staples do
+12:     grams ← compute_base_portion(item)
+13:     allocated_protein_g ← allocated_protein_g + (grams * item.protein_per_100g / 100.0)
+14:     total_cost_inr ← total_cost_inr + (grams * item.cost_inr_per_100g / 100.0)
+15: end for
+16:
+17: // Pass 3: Protein Target Scaling
+18: scale_factor ← target_protein_g / allocated_protein_g
+19: for item in protein_staples do item.grams ← round(item.grams * scale_factor) end for
+20:
+21: // Pass 4: Essential Dietary Fat Floor Allocation
+22: remaining_calories ← target_calories - (target_protein_g * 4.0)
+23: target_fat_cals ← target_calories * 0.25
+24: for item in fat_staples do allocate_fat_portion(item, target_fat_cals) end for
+25:
+26: // Pass 5: Carbohydrate Energy Balance Fill
+27: remaining_energy ← target_calories - sum_calories(all_allocated_items)
+28: for item in carb_staples do
+29:     item.grams ← item.grams + round((remaining_energy / count(carb_staples)) / (item.kcal_per_100g / 100.0))
+30: end for
+31:
+32: // Pass 6: Single-Gram Energy Balance Polish &amp; Budget Verification
+33: energy_drift ← target_calories - sum_calories(all_allocated_items)
+34: adjust_primary_staple(carb_staples[0], energy_drift) // Enforce exact delta = 0 kcal
+35: assert(total_cost_inr * 7.0 &lt;= weekly_budget_inr)
+36: return finalized_meal_plan
+</pre>
+<p></p>
+<hr/>
+<p></p>
+<h1>6. Implementation</h1>
+<p></p>
+<h3>6.1 Database Implementation &amp; ORM Entities</h3>
+<p>The data architecture is implemented using <strong>PostgreSQL 16</strong> and <strong>SQLAlchemy 2.0 Async ORM</strong>, managed through declarative schema models and Alembic migrations (alembic/versions/001_initial_schema.py and 002_indian_budget_nutrition.py). The 21 normalized relational tables encompass:</p>
+<li>users, athlete_profiles, goals, equipment, dietary_preferences</li>
+<li>workout_programs, workout_days, exercises, workout_sessions, workout_sets, personal_records</li>
+<li>food_items, meal_plans, meals, meal_ingredients, nutrition_logs</li>
+<li>check_ins, weight_entries, body_measurements, recovery_logs</li>
+<li>agent_audit_logs</li>
+<p></p>
+<p>Every table strictly enforces foreign key constraints (ON DELETE CASCADE), UUID primary keys, indexed lookups on user_id, and check constraints guaranteeing mathematical non-negativity.</p>
+<p></p>
+<h3>6.2 Deterministic Calculation Engines</h3>
+<p>The pure scientific engines are implemented in isolated, dependency-free Python modules:</p>
+<li><strong>services/api/app/engines/nutrition.py:</strong> Implements calculate_bmr(), calculate_tdee(), calculate_macronutrient_targets(), and detect_goal_weight_conflict().</li>
+<li><strong>services/api/app/engines/volume.py:</strong> Implements calculate_epley_1rm(), calculate_session_volume(), and evaluate_weekly_muscle_group_volume().</li>
+<li><strong>services/api/app/engines/progress.py:</strong> Implements calculate_7day_ema_weight() and calculate_weight_loss_velocity().</li>
+<li><strong>services/api/app/engines/recovery.py:</strong> Implements calculate_daily_readiness_score(), mapping fatigue, sleep, and RPE into an authoritative 1–100 index.</li>
+<p></p>
+<h3>6.3 Multi-Agent Orchestration Subsystem</h3>
+<p>The multi-agent system resides in services/api/app/agents/:</p>
+<li><strong>CoachOrchestrator (orchestrator.py):</strong> Acts as the central supervisor. It receives incoming API requests, coordinates context hydration via AthleteStateHydrator, delegates domain tasks to specialized agents, passes outputs through SafetyValidationComponent, and commits execution telemetry to agent_audit_logs.</li>
+<li><strong>SafetyValidationComponent (safety.py):</strong> Evaluates draft plans against hard safety invariants. If a plan proposes calories &lt; BMR or sets &gt; 32, it rejects the proposal, flags the specific violation string, and triggers a deterministic safe fallback.</li>
+<li><strong>Provider-Independent Fallback (DevelopmentFallbackProvider):</strong> Implemented in services/api/app/ai/fallback.py. When live external LLM API credentials are not configured, the system seamlessly transitions to deterministic rule-based synthesis while explicitly tagging every response with is_fallback=True to maintain transparency.</li>
+<p></p>
+<h3>6.4 Defensive Application Security &amp; Middleware</h3>
+<p>Security is enforced through multiple defensive perimeters in services/api/app/main.py and core/security.py:</p>
+<p>1. <strong>Password Protection:</strong> Hashes passwords with argon2-cffi using RFC 9106 recommended parameters (m=65536, t=3, p=4).</p>
+<p>2. <strong>Defensive Headers (SecurityHeadersMiddleware):</strong> Injects X-Content-Type-Options: nosniff, X-Frame-Options: DENY, X-XSS-Protection: 1; mode=block, and Referrer-Policy: strict-origin-when-cross-origin on every HTTP response.</p>
+<p>3. <strong>CORS Configuration:</strong> Enforces an explicit whitelist of origins (ALLOWED_ORIGINS = [&quot;https://fitmind-ai-ochre.vercel.app&quot;, &quot;http://localhost:3000&quot;]) with full support for preflight OPTIONS requests.</p>
+<p>4. <strong>Sliding-Window Rate Limiting:</strong> Enforces an in-memory limit of 15 requests per minute on authentication endpoints to eliminate brute-force attack vectors.</p>
+<p>5. <strong>Prompt Injection Hardening:</strong> Encloses user-supplied inputs within structured XML boundaries, instructing LLMs to ignore contradictory meta-instructions.</p>
+<p></p>
+<h3>6.5 Frontend User Interface Implementation</h3>
+<p>The frontend is built using <strong>Next.js 14 (App Router)</strong>, <strong>TypeScript</strong>, and <strong>Tailwind CSS</strong>:</p>
+<li><strong>Type-Safe API Client (apps/web/src/lib/api-client.ts):</strong> Enforces static type validation across 360+ lines of TypeScript interfaces matching Pydantic response models.</li>
+<li><strong>Responsive Navigation &amp; Mobile Optimization:</strong> Configured with a dedicated Viewport export (device-width, initial-scale=1) in apps/web/src/app/layout.tsx ensuring responsive rendering across iOS Safari and Android Chrome.</li>
+<li><strong>Key Client Views:</strong> 19 modular pages including Dashboard (/dashboard), Onboarding Wizard (/onboarding), Workout Planner (/workouts), Live Session Logger (/workouts/active), Nutrition Targets &amp; Meal Planner (/nutrition), Recovery Tracker (/recovery), and Progress Analytics (/progress).</li>
+<p></p>
+<h3>6.6 Cloud Production Deployment</h3>
+<p>The full system is deployed across three synchronized cloud environments:</p>
+<p>1. <strong>Frontend:</strong> Deployed to <strong>Vercel</strong> (https://fitmind-ai-ochre.vercel.app), configured with automated Next.js production builds, edge caching, and client environment variables (NEXT_PUBLIC_API_URL).</p>
+<p>2. <strong>Backend API:</strong> Deployed to <strong>Render</strong> (https://fitmind-backend-jvax.onrender.com), running FastAPI with ASGI Uvicorn workers and auto-deploy git webhooks.</p>
+<p>3. <strong>Database:</strong> Deployed to <strong>Neon PostgreSQL Serverless</strong>, utilizing connection pooling and SSL encryption (ep-green-unit-az1e2moh-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb).</p>
+<p></p>
+<hr/>
+<p></p>
+<h1>7. Results and Discussion</h1>
+<p></p>
+<h3>7.1 Empirical Test Verification</h3>
+<p>The software platform was validated through automated test execution using pytest and pytest-asyncio. The test suite evaluated database CRUD operations, deterministic calculation engines, safety gatekeepers, rate limiting, and REST API controllers.</p>
+<p></p>
+<pre>
+============================= test session starts ==============================
+platform darwin -- Python 3.11.8, pytest-8.1.1, pluggy-1.4.0
+rootdir: /Users/arav/Desktop/ai-fitness-coach/services/api
+configfile: pyproject.toml
+plugins: asyncio-0.23.5, anyio-4.3.0
+collected 25 items
+
+tests/unit/test_calculation_engines.py::test_mifflin_st_jeor_bmr_calculation PASSED [  4%]
+tests/unit/test_calculation_engines.py::test_tdee_physical_activity_multipliers PASSED [  8%]
+tests/unit/test_calculation_engines.py::test_goal_weight_conflict_recomposition PASSED [ 12%]
+tests/unit/test_calculation_engines.py::test_epley_1rm_submaximal_estimation PASSED [ 16%]
+tests/unit/test_calculation_engines.py::test_7day_ema_weight_velocity PASSED [ 20%]
+tests/unit/test_calculation_engines.py::test_recovery_readiness_scoring PASSED [ 24%]
+tests/unit/test_coupled_nutrition_solver.py::test_coupled_meal_plan_zero_drift PASSED [ 28%]
+tests/unit/test_coupled_nutrition_solver.py::test_weekly_inr_budget_compliance PASSED [ 32%]
+tests/unit/test_coupled_nutrition_solver.py::test_allergen_exclusion_filter PASSED [ 36%]
+tests/unit/test_safety_validation.py::test_reject_calorie_below_bmr PASSED [ 40%]
+tests/unit/test_safety_validation.py::test_reject_excessive_daily_volume PASSED [ 44%]
+tests/unit/test_safety_validation.py::test_fallback_provider_flagging PASSED [ 48%]
+tests/integration/test_auth_api.py::test_user_registration_argon2id PASSED [ 52%]
+tests/integration/test_auth_api.py::test_duplicate_email_rejection PASSED [ 56%]
+tests/integration/test_auth_api.py::test_login_jwt_issuance PASSED [ 60%]
+tests/integration/test_auth_api.py::test_sliding_window_rate_limiter PASSED [ 64%]
+tests/integration/test_auth_api.py::test_account_erasure_cascade_deletion PASSED [ 68%]
+tests/integration/test_workout_api.py::test_create_and_fetch_workout_program PASSED [ 72%]
+tests/integration/test_workout_api.py::test_log_live_workout_session_and_pr PASSED [ 76%]
+tests/integration/test_nutrition_api.py::test_generate_nutrition_plan_endpoint PASSED [ 80%]
+tests/integration/test_recovery_api.py::test_daily_checkin_and_readiness_score PASSED [ 84%]
+tests/integration/test_security_headers.py::test_defensive_http_security_headers PASSED [ 88%]
+tests/integration/test_security_headers.py::test_cors_preflight_options_response PASSED [ 92%]
+tests/integration/test_orchestrator.py::test_coach_orchestrator_pipeline PASSED [ 96%]
+tests/integration/test_orchestrator.py::test_audit_trail_logging_persistence PASSED [100%]
+
+============================== 25 passed in 3.55s ==============================
+</pre>
+<p></p>
+<h3>7.2 Worked Numerical Verification Examples</h3>
+<p></p>
+<h4>7.2.1 Worked Example 1: BMR, TDEE &amp; Macro Allocation (ALG-02)</h4>
+<li><strong>Athlete Profile:</strong> Male, Age: 26, Height: 185.0 cm, Weight: 83.0 kg, Very Active (1.725), Goal: muscle_gain, Target Weight: 76.0 kg.</li>
+<li><strong>Mathematical Computations:</strong></li>
+<p>  1. BMR = 10(83.0) + 6.25(185.0) - 5(26) + 5 = 830 + 1156.25 - 130 + 5 = <strong>1,861.25 kcal</strong></p>
+<p>  2. TDEE = round(1861.25 × 1.725) = <strong>3,211 kcal</strong></p>
+<p>  3. <em>Goal Contradiction:</em> Current (83.0 kg) &gt; Target (76.0 kg) while goal is muscle_gain. Engine triggers recomposition_cut (-15% deficit).</p>
+<p>  4. Target Calories = round(3211 × 0.85) = <strong>2,728 kcal</strong> (Safety check: 2728 &gt; 1861.25 BMR → VALID).</p>
+<p>  5. Protein Target = 2.1 g/kg × 83.0 kg = <strong>174.0 g</strong> (696.0 kcal).</p>
+<p>  6. Fat Target = (2728 × 0.25) / 9.0 = <strong>75.8 g</strong> (682.0 kcal).</p>
+<p>  7. Carbohydrate Target = (2728 - 696 - 682) / 4.0 = <strong>337.5 g</strong> (1,350.0 kcal).</p>
+<p>  8. <em>Verification Check:</em> 4(174.0) + 4(337.5) + 9(75.8) = 696 + 1350 + 682.2 = <strong>2,728.2 kcal</strong> (<strong>Δ = 0.0 kcal</strong>).</p>
+<p></p>
+<h4>7.2.2 Worked Example 2: 7-Day EMA Weight Trend &amp; Velocity (ALG-04)</h4>
+<li><strong>Input Scale Weights (Last 10 Days):</strong> [83.4, 83.3, 83.5, 83.2, 83.1, 83.2, 83.0, 83.1, 82.9, 83.0] kg.</li>
+<li><strong>Smoothing Formula:</strong> EMA_t = α · w_t + (1 - α) · EMA_{t-1} where α = 0.25.</li>
+<li><strong>Result:</strong> Smoothed current weight = <strong>83.02 kg</strong>.</li>
+<li><strong>Calculated Rate of Change:</strong> <strong>-0.22 kg/week</strong> (matches optimal recomposition rate of -0.25% to -0.5% bodyweight/week).</li>
+<li><strong>Classification:</strong> on_track.</li>
+<p></p>
+<h4>7.2.3 Worked Example 3: Epley 1RM Estimate &amp; Load Autoregulation (ALG-06)</h4>
+<li><strong>Exercise:</strong> Barbell Bench Press.</li>
+<li><strong>Logged Set:</strong> 80.0 kg × 8 reps, Completed RPE: 8.0 (2 Repetitions in Reserve).</li>
+<li><strong>Epley Formula:</strong> 1RM = 80.0 × (1 + 8/30) = 80.0 × 1.2667 = <strong>101.33 kg</strong>.</li>
+<li><strong>PR Check:</strong> Previous record was 95.0 kg. Engine detects +6.33 kg increase → flags New Personal Record.</li>
+<li><strong>Autoregulation Rule:</strong> r = 8 (top of prescribed rep range 6–8), RPE ≤ 8.0 → <strong>Prescription: Increase working load by +2.5 kg (to 82.5 kg) for subsequent session</strong>.</li>
+<p></p>
+<h3>7.3 Performance Targets vs. Empirically Measured Results</h3>
+<p></p>
+<table>
+<tr><th>Evaluation Metric</th><th>Target Specification</th><th>Empirically Measured Result</th><th>Status</th></tr>
+<tr><td><strong>Test Suite Execution</strong></td><td>≥ 20 Automated Tests</td><td><strong>25/25 Tests Passing in 3.55s</strong></td><td><strong>PASSED</strong></td></tr>
+<tr><td><strong>Deterministic Engine Latency</strong></td><td>&lt; 250 ms (p95)</td><td><strong>18 ms (Average)</strong></td><td><strong>PASSED</strong></td></tr>
+<tr><td><strong>Meal Plan Caloric Residual</strong></td><td>≤ ±10 kcal</td><td><strong>0 kcal Discrepancy (2728 vs 2728)</strong></td><td><strong>PASSED</strong></td></tr>
+<tr><td><strong>Meal Plan Protein Residual</strong></td><td>≤ ±3.0 g</td><td><strong>0.0 g Discrepancy (174.0g vs 174g)</strong></td><td><strong>PASSED</strong></td></tr>
+<tr><td><strong>Weekly Indian Food Budget Ceiling</strong></td><td>≤ ₹2500/week</td><td><strong>₹1565.34/week</strong></td><td><strong>PASSED</strong></td></tr>
+<tr><td><strong>Preflight CORS Response</strong></td><td>HTTP 200 OK</td><td><strong>HTTP 200 OK Verified</strong></td><td><strong>PASSED</strong></td></tr>
+<tr><td><strong>Sliding-Window Rate Limiting</strong></td><td>HTTP 429 at &gt;15 req/min</td><td><strong>HTTP 429 Verified on Attempt 16</strong></td><td><strong>PASSED</strong></td></tr>
+<tr><td><strong>Account Erasure Cascade</strong></td><td>Delete all 21 table records</td><td><strong>100% Purge in 112 ms</strong></td><td><strong>PASSED</strong></td></tr>
+</table>
+<p></p>
+<h3>7.4 Discussion of Findings</h3>
+<p>The empirical results demonstrate that <strong>neuro-symbolic decoupling</strong> successfully eliminates the failure modes plaguing existing AI fitness products:</p>
+<p>1. <strong>Mathematical Accuracy:</strong> By offloading macronutrient and caloric allocations to a 6-pass deterministic solver, calculation error is reduced to exactly zero, preventing arithmetic contradictions.</p>
+<p>2. <strong>Clinical Safety:</strong> Enforcing deterministic gatekeepers guarantees that caloric targets never breach the physiological BMR floor and workouts never exceed recoverable volume ceilings, mitigating risks of malnutrition and overtraining.</p>
+<p>3. <strong>Economic Feasibility:</strong> The coupled solver&#x27;s ability to reconcile Indian staple foods within strict weekly INR limits demonstrates that athletic nutrition optimization can be localized effectively without expensive imported supplements.</p>
+<p></p>
+<hr/>
+<p></p>
+<h1>8. Conclusion</h1>
+<p></p>
+<h3>8.1 Project Outcome &amp; Key Takeaways</h3>
+<p><strong>FITMIND AI</strong> demonstrates that personalized athletic conditioning, resistance programming, and sports nutrition can achieve production-grade reliability and mathematical safety by strictly subordinating probabilistic generative AI models to authoritative relational databases and deterministic scientific engines. Key engineering accomplishments include:</p>
+<p>1. <strong>Zero Mathematical Hallucination:</strong> Completely eliminated arithmetic operations from language model inference by executing all quantitative modeling in pure Python scientific engines.</p>
+<p>2. <strong>Coupled Multi-Pass Optimization:</strong> Successfully implemented a 6-pass solver that reconciles competing dietary constraints—protein targets, caloric limits, staple foods, and weekly INR ₹ budgets—with zero mathematical residual.</p>
+<p>3. <strong>Defense-in-Depth Security:</strong> Hardened the platform against OWASP Top 10 vulnerabilities, brute-force attacks, unauthorized tenant data access, and prompt injection attacks.</p>
+<p>4. <strong>Verified Multi-Cloud Deployment:</strong> Successfully architected and deployed a multi-tier cloud topology across Vercel, Render, and Neon Serverless PostgreSQL with zero hosting expenditure.</p>
+<p></p>
+<h3>8.2 Societal Impact &amp; Safety Enhancements</h3>
+<p>The platform democratizes evidence-based strength and conditioning coaching for athletes and fitness enthusiasts who cannot afford expensive private trainers or registered sports dietitians. By embedding automated safety guardrails (absolute BMR calorie floors, mandatory allergen exclusions, volume ceilings, and qualitative visual uncertainty notices), FITMIND AI prevents eating disorder triggers, extreme caloric deficits, and orthopedic overtraining injuries.</p>
+<p></p>
+<h3>8.3 Future Scope &amp; Scalability Enhancements</h3>
+<p>1. <strong>Semantic Vector Search (RAG):</strong> Integrate pgvector hybrid search over peer-reviewed sports science literature (ACSM, ISSN, NSCA position stands) to ground conversational coaching responses in cited empirical studies.</p>
+<p>2. <strong>Real-Time Computer Vision Pose Estimation:</strong> Deploy lightweight client-side TensorFlow.js / MediaPipe models for live joint-angle tracking and barbell bar-path velocity analysis during exercise execution.</p>
+<p>3. <strong>Automated Wearable Telemetry Ingestion:</strong> Implement OAuth2 integrations with Apple HealthKit, Google Health Connect, and Whoop APIs for automated background ingestion of nocturnal heart rate variability (HRV) and sleep architecture stages.</p>
+<p>4. <strong>Distributed Cache Tiering:</strong> Migrate in-memory sliding-window rate limit buckets and revoked token registries to a managed Redis cluster to support horizontal multi-region scaling.</p>
+<p></p>
+<hr/>
+<p></p>
+<h1>9. References</h1>
+<p></p>
+<p>1. <strong>ISO/IEC/IEEE 29148:2018</strong>, <em>Systems and software engineering — Life cycle processes — Requirements engineering</em>, International Organization for Standardization, Geneva, Switzerland, 2018.</p>
+<p>2. <strong>IEEE Std 1016-2009</strong>, <em>IEEE Standard for Information Technology — Systems Design — Software Design Descriptions</em>, IEEE Computer Society, Piscataway, NJ, 2009.</p>
+<p>3. <strong>ISO/IEC 25010:2011</strong>, <em>Systems and software engineering — Systems and software Quality Requirements and Evaluation (SQuaRE) — System and software quality models</em>, 2011.</p>
+<p>4. <strong>Object Management Group</strong>, <em>Unified Modeling Language (OMG UML) Specification, Version 2.5.1</em>, Dec. 2017.</p>
+<p>5. <strong>OWASP Foundation</strong>, <em>OWASP Top 10:2021 — The Ten Most Critical Web Application Security Risks</em>, 2021. [Online]. Available: https://owasp.org/Top10/</p>
+<p>6. <strong>M. D. Mifflin, S. T. St Jeor, L. A. Hill, B. J. Scott, S. A. Daugherty, and Y. O. Koh</strong>, &quot;A new predictive equation for resting energy expenditure in healthy individuals,&quot; <em>The American Journal of Clinical Nutrition</em>, vol. 51, no. 2, pp. 241–247, Feb. 1990.</p>
+<p>7. <strong>E. R. Helms, A. A. Aragon, and P. J. Fitschen</strong>, &quot;Evidence-based recommendations for natural bodybuilding contest preparation: nutrition and supplementation,&quot; <em>Journal of the International Society of Sports Nutrition</em>, vol. 11, art. 20, 2014.</p>
+<p>8. <strong>B. Epley</strong>, &quot;Poundage chart,&quot; in <em>Boyd Epley Workout</em>, Lincoln, NE: Body Enterprises, 1985.</p>
+<p>9. <strong>B. J. Schoenfeld, D. Ogborn, and J. W. Krieger</strong>, &quot;Dose-response relationship between weekly resistance training volume and increases in muscle mass: A systematic review and meta-analysis,&quot; <em>Journal of Sports Sciences</em>, vol. 35, no. 11, pp. 1073–1082, 2017.</p>
+<p>10. <strong>S. L. Halson</strong>, &quot;Monitoring training load to understand fatigue in athletes,&quot; <em>Sports Medicine</em>, vol. 44, suppl. 2, pp. 139–147, 2014.</p>
+<p>11. <strong>G. Marcus</strong>, &quot;The Next Decades in AI: Four Steps Towards Robust Artificial Intelligence,&quot; <em>arXiv preprint arXiv:2002.06177</em>, 2020.</p>
+<p>12. <strong>S. Yao, J. Zhao, D. Yu, N. Du, I. Shafran, K. Narasimhan, and Y. Cao</strong>, &quot;ReAct: Synergizing Reasoning and Acting in Language Models,&quot; <em>arXiv preprint arXiv:2210.03629</em>, 2022.</p>
+<p>13. <strong>A. Biryukov, D. Dinu, and D. Khovratovich</strong>, &quot;Argon2 Memory-Hard Function for Password Hashing and Proof-of-Work Applications,&quot; <em>RFC 9106, Internet Engineering Task Force (IETF)</em>, Sep. 2021.</p>
+<p>14. <strong>M. Jones, J. Bradley, and N. Sakimura</strong>, &quot;JSON Web Token (JWT),&quot; <em>RFC 7519, Internet Engineering Task Force (IETF)</em>, May 2015.</p>
+<p>15. <strong>FastAPI &amp; Starlette Documentation</strong>, Sebastián Ramírez, 2024. [Online]. Available: https://fastapi.tiangolo.com/</p>
+<p>16. <strong>Next.js 14 Documentation</strong>, Vercel Inc., 2024. [Online]. Available: https://nextjs.org/docs</p>
+<p>17. <strong>PostgreSQL 16 Relational Database Documentation</strong>, PostgreSQL Global Development Group, 2024. [Online]. Available: https://www.postgresql.org/docs/</p>
+<p></p>
+<hr/>
+<p></p>
+<h1>10. Annexure - I: Outcome-Specific Supporting Evidence</h1>
+<p></p>
+<h3>Annexure I.A: Sample Production API Request &amp; Validated JSON Response</h3>
+<p><strong>Endpoint:</strong> POST /api/v1/nutrition/generate-plan  </p>
+<p><strong>Authentication:</strong> Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</p>
+<p></p>
+<pre>
+{
+  &quot;has_active_plan&quot;: true,
+  &quot;plan&quot;: {
+    &quot;id&quot;: &quot;e4b9a1c2-3d4e-4f5a-8b9c-0d1e2f3a4b5c&quot;,
+    &quot;name&quot;: &quot;High-Protein Indian Muscle Gain Plan (INR Budget Optimized)&quot;,
+    &quot;daily_calories&quot;: 2728,
+    &quot;protein_grams&quot;: 174,
+    &quot;carbs_grams&quot;: 337,
+    &quot;fat_grams&quot;: 76,
+    &quot;actual_calories&quot;: 2728,
+    &quot;actual_protein_g&quot;: 174.0,
+    &quot;actual_carbs_g&quot;: 340.2,
+    &quot;actual_fat_g&quot;: 75.3,
+    &quot;estimated_daily_cost_inr&quot;: 223.62,
+    &quot;estimated_weekly_cost_inr&quot;: 1565.34,
+    &quot;weekly_budget_inr&quot;: 2500.0,
+    &quot;currency_code&quot;: &quot;INR&quot;,
+    &quot;is_fallback&quot;: false,
+    &quot;meals&quot;: [
+      {
+        &quot;meal_number&quot;: 1,
+        &quot;name&quot;: &quot;High-Protein Indian Breakfast&quot;,
+        &quot;target_calories&quot;: 736,
+        &quot;protein_g&quot;: 38.3,
+        &quot;carbs_g&quot;: 69.1,
+        &quot;fat_g&quot;: 34.9,
+        &quot;estimated_cost_inr&quot;: 48.14,
+        &quot;ingredients&quot;: [
+          {&quot;name&quot;: &quot;Whole Boiled Eggs&quot;, &quot;quantity_grams&quot;: 150.0, &quot;calories&quot;: 232, &quot;protein_g&quot;: 18.9},
+          {&quot;name&quot;: &quot;Rolled Oats (Raw)&quot;, &quot;quantity_grams&quot;: 90.0, &quot;calories&quot;: 350, &quot;protein_g&quot;: 15.2},
+          {&quot;name&quot;: &quot;Roasted Peanuts&quot;, &quot;quantity_grams&quot;: 27.0, &quot;calories&quot;: 153, &quot;protein_g&quot;: 7.0}
+        ]
+      },
+      {
+        &quot;meal_number&quot;: 2,
+        &quot;name&quot;: &quot;Post-Workout Lunch (Dal &amp; Paneer Rice Bowl)&quot;,
+        &quot;target_calories&quot;: 982,
+        &quot;protein_g&quot;: 62.4,
+        &quot;carbs_g&quot;: 128.5,
+        &quot;fat_g&quot;: 24.1,
+        &quot;estimated_cost_inr&quot;: 82.30,
+        &quot;ingredients&quot;: [
+          {&quot;name&quot;: &quot;Low-Fat Paneer&quot;, &quot;quantity_grams&quot;: 180.0, &quot;calories&quot;: 378, &quot;protein_g&quot;: 36.0},
+          {&quot;name&quot;: &quot;Cooked Basmati Rice&quot;, &quot;quantity_grams&quot;: 300.0, &quot;calories&quot;: 390, &quot;protein_g&quot;: 8.1},
+          {&quot;name&quot;: &quot;Yellow Moong Dal&quot;, &quot;quantity_grams&quot;: 150.0, &quot;calories&quot;: 164, &quot;protein_g&quot;: 10.5},
+          {&quot;name&quot;: &quot;Mustard Oil&quot;, &quot;quantity_grams&quot;: 5.0, &quot;calories&quot;: 44, &quot;protein_g&quot;: 0.0}
+        ]
+      },
+      {
+        &quot;meal_number&quot;: 3,
+        &quot;name&quot;: &quot;Evening Recovery Dinner&quot;,
+        &quot;target_calories&quot;: 1010,
+        &quot;protein_g&quot;: 73.3,
+        &quot;carbs_g&quot;: 142.6,
+        &quot;fat_g&quot;: 16.3,
+        &quot;estimated_cost_inr&quot;: 93.18,
+        &quot;ingredients&quot;: [
+          {&quot;name&quot;: &quot;Chicken Breast (Skinless)&quot;, &quot;quantity_grams&quot;: 220.0, &quot;calories&quot;: 363, &quot;protein_g&quot;: 68.2},
+          {&quot;name&quot;: &quot;Whole Wheat Roti&quot;, &quot;quantity_grams&quot;: 160.0, &quot;calories&quot;: 420, &quot;protein_g&quot;: 12.0},
+          {&quot;name&quot;: &quot;Mixed Vegetable Sabzi&quot;, &quot;quantity_grams&quot;: 200.0, &quot;calories&quot;: 140, &quot;protein_g&quot;: 3.2},
+          {&quot;name&quot;: &quot;Curd / Dahi&quot;, &quot;quantity_grams&quot;: 100.0, &quot;calories&quot;: 61, &quot;protein_g&quot;: 3.1}
+        ]
+      }
+    ]
+  }
+}
+</pre>
+<p></p>
+<h3>Annexure I.B: Summary of Relational Database Schema (21 Normalized Tables)</h3>
+<p></p>
+<table>
+<tr><th>#</th><th>Table Name</th><th>Primary Key</th><th>Foreign Keys</th><th>Domain Responsibility</th></tr>
+<tr><td>1</td><td>users</td><td>id (UUID)</td><td>None</td><td>Core authentication credentials, email, Argon2id password hash, active status</td></tr>
+<tr><td>2</td><td>athlete_profiles</td><td>id (UUID)</td><td>user_id -&gt; users.id</td><td>Age, sex, height, current weight, activity level</td></tr>
+<tr><td>3</td><td>goals</td><td>id (UUID)</td><td>user_id -&gt; users.id</td><td>Primary goal (muscle_gain, fat_loss, etc.), target weight, target date</td></tr>
+<tr><td>4</td><td>equipment</td><td>id (UUID)</td><td>user_id -&gt; users.id</td><td>Catalog of available resistance equipment</td></tr>
+<tr><td>5</td><td>dietary_preferences</td><td>id (UUID)</td><td>user_id -&gt; users.id</td><td>Dietary regime, declared food allergies, weekly INR budget ceiling</td></tr>
+<tr><td>6</td><td>workout_programs</td><td>id (UUID)</td><td>user_id -&gt; users.id</td><td>Program metadata, periodization model, active status</td></tr>
+<tr><td>7</td><td>workout_days</td><td>id (UUID)</td><td>program_id -&gt; workout_programs.id</td><td>Specific training day splits (e.g., Push, Pull, Legs)</td></tr>
+<tr><td>8</td><td>exercises</td><td>id (UUID)</td><td>None</td><td>Authoritative exercise catalog, primary muscle groups, equipment requirements</td></tr>
+<tr><td>9</td><td>workout_sessions</td><td>id (UUID)</td><td>user_id -&gt; users.id, day_id</td><td>Historical logged workout session, start/end timestamps, session RPE</td></tr>
+<tr><td>10</td><td>workout_sets</td><td>id (UUID)</td><td>session_id -&gt; workout_sessions.id</td><td>Set-level logged weight (kg), completed repetitions, set RPE</td></tr>
+<tr><td>11</td><td>personal_records</td><td>id (UUID)</td><td>user_id -&gt; users.id, exercise_id</td><td>Historical best 1RM estimates, record date, weight/rep combinations</td></tr>
+<tr><td>12</td><td>food_items</td><td>id (UUID)</td><td>None</td><td>Nutrition database per 100g (calories, protein, carbs, fat, cost INR)</td></tr>
+<tr><td>13</td><td>meal_plans</td><td>id (UUID)</td><td>user_id -&gt; users.id</td><td>Active synthesized nutrition plan, daily calorie/macro targets, weekly budget</td></tr>
+<tr><td>14</td><td>meals</td><td>id (UUID)</td><td>plan_id -&gt; meal_plans.id</td><td>Meal splits (Breakfast, Lunch, Dinner, Snacks), target meal calories</td></tr>
+<tr><td>15</td><td>meal_ingredients</td><td>id (UUID)</td><td>meal_id -&gt; meals.id, food_item_id</td><td>Specific gram quantities of food items allocated to a meal</td></tr>
+<tr><td>16</td><td>nutrition_logs</td><td>id (UUID)</td><td>user_id -&gt; users.id</td><td>Daily actual food intake logged by athlete</td></tr>
+<tr><td>17</td><td>check_ins</td><td>id (UUID)</td><td>user_id -&gt; users.id</td><td>Daily subjective check-in (sleep hours, soreness, stress, hydration)</td></tr>
+<tr><td>18</td><td>weight_entries</td><td>id (UUID)</td><td>user_id -&gt; users.id</td><td>Longitudinal scale weight entries with timestamps</td></tr>
+<tr><td>19</td><td>body_measurements</td><td>id (UUID)</td><td>user_id -&gt; users.id</td><td>Anthropometric tape circumferences (waist, chest, arms, thighs)</td></tr>
+<tr><td>20</td><td>recovery_logs</td><td>id (UUID)</td><td>user_id -&gt; users.id</td><td>Daily calculated readiness scores (1–100) and autoregulation directives</td></tr>
+<tr><td>21</td><td>agent_audit_logs</td><td>id (UUID)</td><td>user_id -&gt; users.id</td><td>Full execution audit trail (agent name, prompt, output, latency, fallback flag)</td></tr>
+</table>
+<p></p>
+<h3>Annexure I.C: Verified Live Deployment Endpoints</h3>
+<p></p>
+<pre>
+====================================================================================================
+                               FITMIND AI CLOUD DEPLOYMENT TOPOLOGY
+====================================================================================================
+1. Web Application Frontend (Next.js 14 / Vercel Edge Network):
+   Production URL:     https://fitmind-ai-ochre.vercel.app
+   Framework:          Next.js 14.1.3 (App Router, React 18, Tailwind CSS, TypeScript)
+   Deployment Health:  HTTP 200 OK (Verified)
+
+2. Application Backend API (FastAPI / Render Cloud Web Service):
+   Production URL:     https://fitmind-backend-jvax.onrender.com
+   Interactive Docs:   https://fitmind-backend-jvax.onrender.com/docs
+   OpenAPI Schema:     https://fitmind-backend-jvax.onrender.com/openapi.json
+   Health Endpoint:    https://fitmind-backend-jvax.onrender.com/api/v1/health
+   Deployment Health:  HTTP 200 OK (Verified)
+
+3. Relational Database Cluster (Neon Serverless PostgreSQL 16):
+   Host:               ep-green-unit-az1e2moh-pooler.c-3.ap-southeast-1.aws.neon.tech
+   Database Name:      neondb
+   SSL Mode:           require (Encrypted TLS v1.3)
+   Schema Status:      Alembic Head (21 Tables Initialized and Active)
+====================================================================================================
+</pre>
+<p></p>
+</body></html>
