@@ -140,8 +140,24 @@ async def test_cross_module_consistency_end_to_end(
     weekly_cost = round(plan["estimated_daily_cost_inr"] * 7.0, 2)
     assert weekly_cost <= 2500.0, f"Weekly cost ₹{weekly_cost} exceeded budget ₹2500"
     total_meal_kcal = sum(int(m["target_calories"]) for m in plan["meals"])
+    total_meal_pro = round(sum(float(m["protein_g"]) for m in plan["meals"]), 1)
+    total_meal_carb = round(sum(float(m["carbs_g"]) for m in plan["meals"]), 1)
+    total_meal_fat = round(sum(float(m["fat_g"]) for m in plan["meals"]), 1)
+
     assert abs(total_meal_kcal - int(plan["daily_calories"])) <= 5, (
         f"Meal calorie sum ({total_meal_kcal} kcal) did not reconcile with daily target ({plan['daily_calories']} kcal)"
+    )
+    assert abs(total_meal_pro - float(plan["protein_grams"])) <= 3.0, (
+        f"Meal protein sum ({total_meal_pro}g) deviated from target ({plan['protein_grams']}g)"
+    )
+    assert total_meal_pro >= float(plan["protein_grams"]) - 1.0, (
+        f"Meal protein sum ({total_meal_pro}g) fell below minimum requirement ({plan['protein_grams']}g)"
+    )
+    assert abs(total_meal_carb - float(plan["carbs_grams"])) <= 15.0, (
+        f"Meal carbs sum ({total_meal_carb}g) deviated from target ({plan['carbs_grams']}g)"
+    )
+    assert abs(total_meal_fat - float(plan["fat_grams"])) <= 8.0, (
+        f"Meal fat sum ({total_meal_fat}g) deviated from target ({plan['fat_grams']}g)"
     )
 
     # Also test with an explicit high-surplus target (target_weight_kg=90 kg -> 3596 kcal) under ₹2500/wk budget

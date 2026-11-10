@@ -266,6 +266,11 @@ async def get_active_nutrition_plan(
     if not plan:
         return {"has_active_plan": False, "plan": None}
 
+    actual_calories = sum(int(m.target_calories or 0) for m in plan.meals)
+    actual_protein_g = round(sum(float(m.protein_g or 0.0) for m in plan.meals), 1)
+    actual_carbs_g = round(sum(float(m.carbs_g or 0.0) for m in plan.meals), 1)
+    actual_fat_g = round(sum(float(m.fat_g or 0.0) for m in plan.meals), 1)
+
     return {
         "has_active_plan": True,
         "plan": {
@@ -275,6 +280,10 @@ async def get_active_nutrition_plan(
             "protein_grams": plan.protein_grams,
             "carbs_grams": plan.carbs_grams,
             "fat_grams": plan.fat_grams,
+            "actual_calories": actual_calories,
+            "actual_protein_g": actual_protein_g,
+            "actual_carbs_g": actual_carbs_g,
+            "actual_fat_g": actual_fat_g,
             "estimated_daily_cost_inr": plan.estimated_daily_cost_inr,
             "estimated_weekly_cost_inr": round((plan.estimated_daily_cost_inr or 0.0) * 7.0, 2),
             "weekly_budget_inr": nut_profile.weekly_food_budget_amount,

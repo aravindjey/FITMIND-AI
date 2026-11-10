@@ -193,3 +193,29 @@ Following manual testing of the Athlete Profile, Nutrition Planner, and AI Coach
 - **Fix Implemented**:
   - Updated `apps/web/next.config.mjs` to isolate build output directories by phase (`distDir: phase === 'phase-development-server' ? '.next' : '.next-build'`) and added `.next-build/` to `.gitignore`.
   - Verified that even after running `npm run build`, `GET http://localhost:3000/_next/static/css/app/layout.css` returns `HTTP 200 OK` (`30,719 bytes`) with all custom Tailwind theme classes (`.bg-dark-900`, `.bg-dark-800`, `.text-brand-400`).
+
+---
+
+## 11. Coupled Nutritional Macro Reconciliation Audit (`219.9g` Protein $\rightarrow$ `174.0g` Target)
+
+### Root Cause
+Previously, `NutritionAgent._build_deterministic_meals()` (`services/api/app/agents/nutrition_agent.py`) scaled primary protein sources using `p_mult = max(0.80, min(1.45, total_pro / 135.0))` (`174 / 135 = 1.289`) without subtracting the secondary protein (`~54g`) contributed by carbohydrate and fat staples (`Rolled Oats`, `Steamed Basmati Rice`, `Whole Wheat Roti`, `Roasted Peanuts`, `Mixed Seasonal Sabzi`). As a result:
+- Total protein reached `219.9 g` (`+45.9 g` above the `174 g` target), consuming `+183.6 kcal`.
+- To maintain `2728 kcal`, the calorie loop had to reduce carbohydrates to `285.1 g` (`-51.9 g` below the `337 g` target).
+
+### Fix Implemented
+- Implemented a **6-pass Coupled Macro, Calorie & INR Budget Reconciliation Solver** in `NutritionAgent._build_deterministic_meals()` (`services/api/app/agents/nutrition_agent.py` lines 160–284) with realistic culinary serving bounds (`_serving_bounds()`):
+  1. Enforces the weekly ₹ INR budget (`weekly_budget_inr`).
+  2. Reconciles essential fats via nut/seed or dairy side items (`sp["items"][2]`).
+  3. Reconciles total protein (`primary + secondary` across all 12 meal ingredients) by adjusting primary protein portions (`sp["items"][0]`) so summed protein matches `total_pro` (`174.0 g`) and never drops below the minimum requirement.
+  4. Reconciles total calories and carbohydrates via carbohydrate staples (`sp["items"][1]`), followed by a 1-gram polish step to eliminate integer-gram rounding drift.
+- Updated `GET /api/v1/nutrition/active-plan` (`services/api/app/api/v1/endpoints/nutrition.py`) and `apps/web/src/app/(dashboard)/nutrition/page.tsx` to display both the deterministic plan targets and the exact summed meal totals (`actual_calories`, `actual_protein_g`, `actual_carbs_g`, `actual_fat_g`).
+- Added macro reconciliation assertions (`protein`, `carbs`, `fat`, and `calories`) to `services/api/tests/test_cross_module_consistency.py`.
+
+### Verified SQLite & Live API Reconciliation (`83.0 kg` Athlete Profile)
+- **Targets**: `2728 kcal` | `174 g` Protein | `337 g` Carbs | `76 g` Fat | `₹2500.00/week` Budget
+- **Reconciled Meal Totals**: **`2728 kcal`** (`0 kcal` diff) | **`174.0 g` Protein** (`0.0 g` diff) | **`340.2 g` Carbs** (`+3.2 g` / `+0.9%` diff) | **`75.3 g` Fat** (`-0.7 g` / `-0.9%` diff) | **`₹1565.34/week`** (`₹223.62/day` $\le$ `₹2500/week`)
+  - **Meal 1 (`High-Protein Indian Breakfast`)**: `736 kcal` | `38.3g P`, `69.1g C`, `34.9g F` | `₹48.14`
+  - **Meal 2 (`Balanced Indian Thali Lunch`)**: `719 kcal` | `50.5g P`, `102.6g C`, `9.5g F` | `₹77.58`
+  - **Meal 3 (`Pre/Post-Workout Fuel Snack`)**: `525 kcal` | `31.6g P`, `65.7g C`, `18.0g F` | `₹30.72`
+  - **Meal 4 (`Recovery Dinner`)**: `748 kcal` | `53.6g P`, `102.8g C`, `12.9g F` | `₹67.18`
