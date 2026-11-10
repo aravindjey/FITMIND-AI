@@ -1,7 +1,6 @@
 import re, html, os, subprocess
 
 prs_content = """# TABLE OF CONTENTS
-*(Students are required to prepare the PRS project report content for their respective project titles under the following sections)*
 
 | S. No. | Title of the Exercise | Page No. |
 | :---: | :--- | :---: |
