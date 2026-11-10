@@ -1,16 +1,30 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { apiClient, User } from '@/lib/api-client';
-import { Settings as SettingsIcon, Shield, Database, Bell, Cpu } from 'lucide-react';
+import { Settings as SettingsIcon, Shield, Database, Bell, Cpu, Trash2 } from 'lucide-react';
 
 export default function SettingsPage() {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     apiClient.getMe().then((data) => setUser(data)).catch(() => {});
     apiClient.getAuditLogs().then((logs) => setAuditLogs(logs || [])).catch(() => {});
   }, []);
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    try {
+      await apiClient.deleteAccount();
+      router.push('/login');
+    } catch {
+      setDeleting(false);
+    }
+  };
 
   return (
     <div className="space-y-8 max-w-4xl">
@@ -124,6 +138,48 @@ export default function SettingsPage() {
             No AI agent runs recorded yet. Generate a plan or chat with the AI Coach to populate audit logs.
           </p>
         )}
+      </div>
+
+      {/* Privacy & Right-to-Erasure Section */}
+      <div className="bg-dark-800 border border-red-500/20 rounded-2xl p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Trash2 className="w-5 h-5 text-red-400" />
+            <div>
+              <h3 className="font-bold text-white">Privacy &amp; Personal Data Erasure</h3>
+              <p className="text-xs text-gray-400">
+                Permanently delete your account, biometric profile, workout logs, nutrition records, progress photos, and AI audit history (`DELETE /api/v1/auth/me`).
+              </p>
+            </div>
+          </div>
+          {!confirmDelete ? (
+            <button
+              type="button"
+              onClick={() => setConfirmDelete(true)}
+              className="px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 text-xs font-semibold transition-colors"
+            >
+              Delete Account &amp; Data
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={handleDeleteAccount}
+                className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-semibold transition-colors disabled:opacity-50"
+              >
+                {deleting ? 'Erasing...' : 'Confirm Permanent Erasure'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(false)}
+                className="px-3 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-semibold transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

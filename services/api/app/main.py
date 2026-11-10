@@ -2,6 +2,7 @@ import logging
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.core.config import settings
 from app.api.v1.router import api_router
@@ -13,22 +14,43 @@ logging.basicConfig(
 )
 logger = logging.getLogger("ai_fitness_coach")
 
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    """Attaches standard defensive HTTP security headers to all API responses."""
+
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        if not request.url.path.startswith(("/docs", "/redoc", "/api/v1/openapi.json")):
+            response.headers["Content-Security-Policy"] = "default-src 'self'; frame-ancestors 'none'"
+        if settings.ENVIRONMENT.lower() == "production":
+            response.headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains; preload"
+        return response
+
+
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    description="Production-Grade Personalized Fitness & Athletic Coaching Platform API",
+    description="FITMIND AI — Intelligent Fitness. Science-Driven Results. Personalized Coaching Platform API",
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     docs_url="/docs",
     redoc_url="/redoc",
 )
 
-# CORS Middleware
+# Defensive HTTP Security Headers Middleware
+app.add_middleware(SecurityHeadersMiddleware)
+
+# CORS Middleware with explicit methods and headers
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"],
 )
 
 
@@ -48,7 +70,7 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 @app.get("/")
 async def root():
     return {
-        "message": "Welcome to AI Fitness Coach API",
+        "message": "Welcome to FITMIND AI API",
         "docs": f"{settings.API_V1_STR}/docs",
         "health": f"{settings.API_V1_STR}/health"
     }

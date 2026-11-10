@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 
 from app.core.database import Base, get_db
 from app.main import app
-from app.core.security import get_password_hash, create_access_token
+from app.core.security import get_password_hash, create_access_token, reset_auth_rate_limits
 from app.repositories.user_repository import UserRepository
 from app.repositories.athlete_repository import AthleteRepository
 
@@ -49,6 +49,8 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
 
 @pytest_asyncio.fixture(scope="function")
 async def async_client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
+    reset_auth_rate_limits()
+
     async def _override_get_db():
         yield db_session
 

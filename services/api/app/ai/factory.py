@@ -137,7 +137,11 @@ class GeminiProvider(BaseLLMProvider, BaseVisionProvider):
     ) -> StructuredAIResponse[T]:
         start_time = time.time()
         schema_json = json.dumps(response_schema.model_json_schema())
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model_name}:generateContent?key={self.api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model_name}:generateContent"
+        headers = {
+            "x-goog-api-key": self.api_key,
+            "Content-Type": "application/json",
+        }
         payload = {
             "contents": [
                 {
@@ -152,7 +156,7 @@ class GeminiProvider(BaseLLMProvider, BaseVisionProvider):
         }
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
-                resp = await client.post(url, json=payload)
+                resp = await client.post(url, headers=headers, json=payload)
                 resp.raise_for_status()
                 body = resp.json()
                 text_out = body["candidates"][0]["content"]["parts"][0]["text"]
@@ -166,7 +170,7 @@ class GeminiProvider(BaseLLMProvider, BaseVisionProvider):
                     execution_time_ms=execution_ms,
                 )
         except Exception as e:
-            fb = DevelopmentFallbackProvider(reason=f"Gemini API error: {str(e)}")
+            fb = DevelopmentFallbackProvider(reason=f"Gemini API error ({type(e).__name__})")
             return await fb.generate_structured_output(prompt, system_instruction, response_schema, temperature)
 
     async def analyze_image_structured(
@@ -178,7 +182,11 @@ class GeminiProvider(BaseLLMProvider, BaseVisionProvider):
         start_time = time.time()
         schema_json = json.dumps(response_schema.model_json_schema())
         b64_img = base64.b64encode(image_bytes).decode("utf-8")
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.vision_model_name}:generateContent?key={self.api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.vision_model_name}:generateContent"
+        headers = {
+            "x-goog-api-key": self.api_key,
+            "Content-Type": "application/json",
+        }
         payload = {
             "contents": [
                 {
@@ -193,7 +201,7 @@ class GeminiProvider(BaseLLMProvider, BaseVisionProvider):
         }
         try:
             async with httpx.AsyncClient(timeout=45.0) as client:
-                resp = await client.post(url, json=payload)
+                resp = await client.post(url, headers=headers, json=payload)
                 resp.raise_for_status()
                 body = resp.json()
                 text_out = body["candidates"][0]["content"]["parts"][0]["text"]
@@ -207,7 +215,7 @@ class GeminiProvider(BaseLLMProvider, BaseVisionProvider):
                     execution_time_ms=execution_ms,
                 )
         except Exception as e:
-            fb = DevelopmentFallbackProvider(reason=f"Gemini Vision API error: {str(e)}")
+            fb = DevelopmentFallbackProvider(reason=f"Gemini Vision API error ({type(e).__name__})")
             return await fb.analyze_image_structured(image_bytes, prompt, response_schema)
 
 
