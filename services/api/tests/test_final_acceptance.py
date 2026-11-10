@@ -100,7 +100,7 @@ async def test_all_eight_agents_individually_and_orchestrator():
     )
     assert coach_out.agent_name == "FitnessCoachingAgent"
     assert "3020 kcal" in coach_out.result_data["answer"]
-    assert len(coach_out.result_data["referenced_metrics"]) == 4
+    assert len(coach_out.result_data["referenced_metrics"]) == 5
 
     # 5. ProgressAgent
     prog_out = await ProgressAgent().process(

@@ -16,6 +16,7 @@ from app.models.progress import BodyMeasurement, ProgressPhoto
 from app.models.audit import AgentAuditLog
 from app.engines.weight_trend import calculate_ema_weight_trend, calculate_rate_of_change
 from app.engines.workout_engine import calculate_recovery_readiness
+from app.engines.nutrition_engine import calculate_nutrition_targets
 
 
 class AthleteStateHydrator:
@@ -28,6 +29,7 @@ class AthleteStateHydrator:
             select(AthleteProfile)
             .options(selectinload(AthleteProfile.goals))
             .where(AthleteProfile.user_id == user_id)
+            .execution_options(populate_existing=True)
         )
         profile = prof_res.scalars().first()
         if not profile:
@@ -136,6 +138,18 @@ class AthleteStateHydrator:
         )
         sessions = ws_res.scalars().all()
 
+        # Always compute authoritative deterministic nutrition targets & conflict warnings from current profile + goal
+        det_targets = calculate_nutrition_targets(
+            weight_kg=profile.current_weight_kg,
+            height_cm=profile.height_cm,
+            age=profile.age,
+            sex=profile.sex,
+            activity_level=profile.activity_level,
+            primary_goal=active_goal.primary_goal if active_goal else "general_fitness",
+            dietary_type=nut_profile.dietary_type if nut_profile else prefs.get("dietary_type", "omnivore"),
+            target_weight_kg=active_goal.target_weight_kg if active_goal else None,
+        )
+
         return {
             "has_profile": True,
             "user_id": str(user_id),
@@ -153,6 +167,8 @@ class AthleteStateHydrator:
                 "sport_position": profile.sport_position,
                 "primary_goal": active_goal.primary_goal if active_goal else "general_fitness",
                 "target_weight_kg": active_goal.target_weight_kg if active_goal else None,
+                "goal_weight_conflict": det_targets["goal_weight_conflict"],
+                "goal_conflict_warning": det_targets["goal_conflict_warning"],
             },
             "constraints": {
                 "equipment": prefs.get("equipment", ["bodyweight", "dumbbell", "barbell"]),
@@ -167,14 +183,7 @@ class AthleteStateHydrator:
                 "disliked_foods": food_prefs_by_type["disliked"] + food_prefs_by_type["avoided"],
                 "staple_foods": food_prefs_by_type["staple"] + food_prefs_by_type["liked"],
             },
-            "nutrition_targets": {
-                "bmr_kcal": nut_profile.bmr_kcal,
-                "tdee_kcal": nut_profile.tdee_kcal,
-                "target_calories": nut_profile.target_calories,
-                "protein_grams": nut_profile.protein_grams,
-                "carbs_grams": nut_profile.carbs_grams,
-                "fat_grams": nut_profile.fat_grams,
-            } if nut_profile else None,
+            "nutrition_targets": det_targets,
             "active_workout_plan": {
                 "id": str(active_wp.id),
                 "name": active_wp.name,

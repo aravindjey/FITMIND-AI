@@ -65,11 +65,28 @@ class FitnessCoachingAgent(BaseAgent):
         )
 
         weight = summary.get("weight_kg", "unrecorded")
+        target_weight = summary.get("target_weight_kg")
         goal = str(summary.get("primary_goal", "general_fitness")).replace("_", " ")
+        goal_conflict_warning = summary.get("goal_conflict_warning") or nut_targets.get("goal_conflict_warning")
         cal = nut_targets.get("target_calories", "not yet calculated")
         pro = nut_targets.get("protein_grams", "not yet calculated")
         readiness = recovery.get("readiness_score", 80)
         weekly_rate = weight_trend.get("weekly_rate_kg", 0.0)
+        active_wp = context.get("active_workout_plan")
+        active_np = context.get("active_nutrition_plan")
+
+        if active_wp:
+            workout_status_text = (
+                f"your active {active_wp.get('days_per_week', 4)}-day '{active_wp.get('name')}' "
+                f"({str(active_wp.get('training_split', 'split')).replace('_', ' ')})"
+            )
+            workout_ref_label = f"Active Workout Plan: {active_wp.get('name')} ({active_wp.get('days_per_week')}d/wk)"
+        else:
+            workout_status_text = (
+                f"no active workout plan generated yet (your profile preference is {constraints.get('days_per_week', 4)} days/week; "
+                f"visit the Workout Planner to generate your active program)"
+            )
+            workout_ref_label = "Active Workout Plan: None (Not Yet Generated)"
 
         if not ai_resp.is_fallback and ai_resp.data.answer:
             answer = ai_resp.data.answer
@@ -78,7 +95,9 @@ class FitnessCoachingAgent(BaseAgent):
             q_lower = prompt_text.lower()
             if any(w in q_lower for w in ("diet", "food", "protein", "calorie", "eat", "meal", "paneer", "budget")):
                 answer = (
-                    f"Based on your current database profile ({weight} kg, primary goal: {goal}), "
+                    f"Based on your current database profile ({weight} kg"
+                    + (f", target weight: {target_weight} kg" if target_weight else "")
+                    + f", primary goal: {goal}), "
                     f"your deterministic nutrition targets are {cal} kcal/day with {pro}g protein. "
                     f"Your configured diet type is '{constraints.get('dietary_type', 'omnivore')}' with a weekly food budget of ₹{constraints.get('weekly_budget_inr', 2500)}. "
                     f"Distribute protein evenly across {constraints.get('meals_per_day', 4)} meals using your preferred staples."
@@ -99,21 +118,38 @@ class FitnessCoachingAgent(BaseAgent):
                     "Log your daily check-in tomorrow morning to update your readiness trend.",
                 ]
             else:
-                answer = (
-                    f"For your primary goal of {goal} at {weight} kg (7-day weight velocity: {weekly_rate:+.2f} kg/week, "
-                    f"readiness: {readiness}/100), focus on progressive overload within your {constraints.get('days_per_week', 4)}-day split "
-                    f"while maintaining {cal} kcal and {pro}g protein/day."
-                )
-                steps = [
-                    "Log every working set with weight, reps, and RPE in the Workout Logger.",
-                    "When you hit the top of your target rep range at <= RPE 8, increase load by 2.5 kg next session.",
-                    f"Maintain daily intake around {cal} kcal and {pro}g protein.",
-                ]
+                if active_wp:
+                    answer = (
+                        f"For your primary goal of {goal} at {weight} kg (7-day weight velocity: {weekly_rate:+.2f} kg/week, "
+                        f"readiness: {readiness}/100), focus on progressive overload within {workout_status_text} "
+                        f"while maintaining {cal} kcal and {pro}g protein/day."
+                    )
+                    steps = [
+                        f"Follow {active_wp.get('name')} and log every working set with weight, reps, and RPE.",
+                        "When you hit the top of your target rep range at <= RPE 8, increase load by 2.5 kg next session.",
+                        f"Maintain daily intake around {cal} kcal and {pro}g protein.",
+                    ]
+                else:
+                    answer = (
+                        f"For your primary goal of {goal} at {weight} kg (7-day weight velocity: {weekly_rate:+.2f} kg/week, "
+                        f"readiness: {readiness}/100), you currently have {workout_status_text}. "
+                        f"Your daily nutrition target is {cal} kcal and {pro}g protein/day."
+                    )
+                    steps = [
+                        "Open the Workout Planner and click 'Generate AI Workout Plan' to create your active training split.",
+                        "Once generated, log every working set with weight, reps, and RPE to track progressive overload.",
+                        f"Maintain daily intake around {cal} kcal and {pro}g protein.",
+                    ]
+
+            if goal_conflict_warning:
+                answer = f"⚠️ {goal_conflict_warning}\n\n{answer}"
+                steps.insert(0, "Review your Primary Goal vs. Target Weight in Athlete Profile so they align.")
 
         referenced = [
-            f"Weight: {weight} kg",
+            f"Weight: {weight} kg" + (f" -> Target: {target_weight} kg" if target_weight else ""),
             f"Goal: {goal}",
             f"Target Calories: {cal} kcal ({pro}g Protein)",
+            workout_ref_label,
             f"Readiness Score: {readiness}/100",
         ]
 

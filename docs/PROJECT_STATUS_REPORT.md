@@ -138,3 +138,35 @@ cd /Users/arav/Desktop/ai-fitness-coach/apps/web
 npm run build
 npm run dev
 ```
+
+---
+
+## 9. Cross-Module Consistency Audit & Remediation (Tasks A–J)
+
+Following manual testing of the Athlete Profile, Nutrition Planner, and AI Coach interface, four cross-module consistency issues were identified, root-caused, remediated, and covered with automated regression tests (`services/api/tests/test_cross_module_consistency.py`):
+
+### Issue 1 & 2: Goal vs. Target Weight Contradiction (`83 kg`, `Muscle Gain`, Target `76 kg` $\rightarrow$ `+12%` Surplus)
+- **Root Cause**: `calculate_nutrition_targets()` in `services/api/app/engines/nutrition_engine.py` previously did not accept `target_weight_kg` and applied a fixed `+12%` calorie surplus (`3210 kcal` TDEE $\rightarrow$ `3596 kcal`) whenever `primary_goal == "muscle_gain"`, even when `target_weight_kg` (`76 kg`) was `7 kg` below `current_weight_kg` (`83 kg`). Furthermore, `PUT /api/v1/athlete/profile` did not resynchronize `NutritionProfile` targets when weight or goals were edited.
+- **Fix Implemented**:
+  - Added `detect_goal_weight_conflict(current_weight_kg, target_weight_kg, primary_goal)` in `services/api/app/engines/nutrition_engine.py`.
+  - When a mass/strength goal (`muscle_gain`, `bodybuilding`, `strength`, `powerlifting`) is paired with a `target_weight_kg` more than `1.0 kg` below `current_weight_kg`, the engine flags `goal_weight_conflict=True`, switches `effective_regime` to `"recomposition_cut"` (`-15%` caloric deficit: `3210 kcal` TDEE $\rightarrow$ `2728 kcal` target with `2.1g/kg` high protein to preserve/build lean tissue while reducing body weight toward `76 kg`), and returns a detailed `goal_conflict_warning`.
+  - Conversely, when `fat_loss` is selected with a `target_weight_kg` more than `1.0 kg` above `current_weight_kg`, it flags `goal_weight_conflict=True` and prompts the athlete to clarify their goal.
+  - Updated `AthleteStateHydrator.get_hydrated_state()` (`services/api/app/services/state_hydrator.py`), `PUT /api/v1/athlete/profile` (`services/api/app/api/v1/endpoints/athlete.py`), and `GET /api/v1/nutrition/targets` (`services/api/app/api/v1/endpoints/nutrition.py`) to compute and persist `target_weight_kg`-aware targets across all modules.
+  - Added amber conflict warning banners on `/profile`, `/dashboard`, and `/nutrition`.
+
+### Issue 3: Weekly INR Food Budget Enforcement (`₹2581/week` vs `₹2500/week` Budget) & Food Database Exactness
+- **Root Cause**: `NutritionAgent._build_deterministic_meals()` (`services/api/app/agents/nutrition_agent.py`) previously scaled meal protein and carb portions for heavier athletes (`83 kg`, `3596 kcal`) without enforcing the weekly INR ceiling (`₹2500/week` = `₹357.14/day`), resulting in `₹368.7/day` (`₹2581/week`), and used hardcoded approximations instead of computing macros directly from `DEFAULT_FOOD_ITEMS`.
+- **Fix Implemented**:
+  - Added `FOOD_CATALOG_BY_NAME` and `compute_ingredient_from_db(food_name, quantity_grams)` in `services/api/app/agents/nutrition_agent.py` so every ingredient's calories, protein, carbs, fat, and ₹ INR cost are computed strictly from `DEFAULT_FOOD_ITEMS` (`services/api/app/services/seed_data.py`).
+  - Added deterministic budget enforcement in `_build_deterministic_meals()`: if `daily_cost * 7.0 > weekly_budget_inr`, expensive protein items (`Whey Protein`, `Paneer`, `Fish`, `Chicken`) are substituted with high-protein Indian budget staples (`Soya Chunks`, `Moong Dal`, `Whole Boiled Eggs`) and portion-adjusted so `estimated_weekly_cost_inr <= weekly_budget_inr` is strictly guaranteed.
+  - Updated `validate_nutrition_plan_safety()` (`services/api/app/engines/safety_engine.py`) to validate `weekly_budget_inr` compliance.
+
+### Issue 4: AI Coach Referencing a 4-Day Split When No Active Workout Plan Exists
+- **Root Cause**: `FitnessCoachingAgent.process()` (`services/api/app/agents/stubs.py`) interpolated `constraints.get("days_per_week", 4)` into `"focus on progressive overload within your 4-day split"` without checking if `context.get("active_workout_plan")` was `None`.
+- **Fix Implemented**:
+  - Updated `FitnessCoachingAgent.process()` to inspect `active_wp = context.get("active_workout_plan")`.
+  - When `active_wp` is `None`, the coach explicitly states `"no active workout plan generated yet (your profile preference is X days/week; visit the Workout Planner to generate your active program)"` and reports `"Active Workout Plan: None (Not Yet Generated)"` in `referenced_metrics`.
+  - Only when an active `WorkoutPlan` record exists in the database does the AI Coach reference the active plan name and split.
+
+### Regression Test Suite Verification
+- Added `services/api/tests/test_cross_module_consistency.py` and executed the full backend test suite: **`20 passed in 1.77s`**.

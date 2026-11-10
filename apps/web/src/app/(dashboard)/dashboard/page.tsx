@@ -126,6 +126,24 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Goal vs Target Weight Conflict Warning */}
+      {targets.goal_conflict_warning && (
+        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-start justify-between gap-4">
+          <div>
+            <span className="font-bold text-amber-200 block mb-0.5">
+              ⚠️ Goal &amp; Target Weight Consistency Warning
+            </span>
+            <span>{targets.goal_conflict_warning}</span>
+          </div>
+          <Link
+            href="/profile"
+            className="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 font-semibold whitespace-nowrap self-center"
+          >
+            Clarify Goal
+          </Link>
+        </div>
+      )}
+
       {/* Primary Biometrics & Readiness Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-5 bg-dark-800 border border-gray-800 rounded-2xl">

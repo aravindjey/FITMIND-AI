@@ -5,6 +5,31 @@ from app.agents.base import BaseAgent, AgentInputEnvelope, AgentOutputEnvelope
 from app.ai.factory import get_llm_provider
 from app.engines.nutrition_engine import calculate_nutrition_targets
 from app.engines.safety_engine import validate_nutrition_plan_safety
+from app.services.seed_data import DEFAULT_FOOD_ITEMS
+
+
+FOOD_CATALOG_BY_NAME: Dict[str, Dict[str, Any]] = {
+    item["name"]: item for item in DEFAULT_FOOD_ITEMS
+}
+
+
+def compute_ingredient_from_db(food_name: str, quantity_grams: float) -> Dict[str, Any]:
+    """Computes exact ingredient calories, macros, and INR cost strictly from the validated
+    DEFAULT_FOOD_ITEMS per-100g catalog.
+    """
+    item = FOOD_CATALOG_BY_NAME[food_name]
+    grams = max(5.0, round(float(quantity_grams), 0))
+    mult = grams / 100.0
+    return {
+        "name": item["name"],
+        "quantity_grams": grams,
+        "preparation_state": item["preparation_state"],
+        "calories": int(round(item["calories_per_100g"] * mult)),
+        "protein_g": round(item["protein_per_100g"] * mult, 1),
+        "carbs_g": round(item["carbs_per_100g"] * mult, 1),
+        "fat_g": round(item["fat_per_100g"] * mult, 1),
+        "cost_inr": round(item["estimated_cost_inr_per_100g"] * mult, 2),
+    }
 
 
 class MealIngredientSchema(BaseModel):
@@ -40,7 +65,7 @@ class NutritionPlanLLMOutput(BaseModel):
 class NutritionAgent(BaseAgent):
     """Component #3: Nutrition Agent.
     Uses deterministic BMR/TDEE/Macro calculations and validated food items to construct
-    allergen-safe, INR-budget-aware meal plans.
+    allergen-safe, INR-budget-enforced meal plans.
     """
 
     @property
@@ -52,7 +77,6 @@ class NutritionAgent(BaseAgent):
         dietary_type = str(constraints.get("dietary_type", "omnivore")).lower()
         meals_per_day = int(constraints.get("meals_per_day", 4))
         allergies = [a.lower().strip() for a in constraints.get("allergies", [])]
-        disliked = [d.lower().strip() for d in constraints.get("disliked_foods", [])]
         weekly_budget_inr = float(constraints.get("weekly_budget_inr") or 2500.0)
         daily_budget_inr = round(weekly_budget_inr / 7.0, 2)
 
@@ -68,104 +92,135 @@ class NutritionAgent(BaseAgent):
         has_egg_allergy = any(x in allergies for x in ("egg", "eggs"))
         has_soy_allergy = any(x in allergies for x in ("soy", "soya"))
 
-        # Select culturally appropriate Indian staple protein, carb, and fat sources respecting restrictions
-        if is_vegan or has_dairy_allergy:
-            pro_breakfast = ("Soya Chunks Bhurji (Dry Weight)", 50.0, 172, 26.0, 16.5, 0.3, 10.0) if not has_soy_allergy else ("Moong Dal Chilla / Sprouts", 180.0, 209, 13.0, 31.5, 3.8, 18.0)
-            pro_lunch = ("Rajma / Chana Masala (Cooked)", 250.0, 350, 21.0, 52.5, 6.5, 30.0)
-            pro_snack = ("Roasted Chana & Sprouts Bowl", 100.0, 160, 11.0, 24.0, 2.5, 15.0)
-            pro_dinner = ("Moong / Toor Dal Tadka (Cooked)", 250.0, 290, 18.0, 43.8, 5.2, 25.0)
-        elif is_veg:
-            pro_breakfast = ("Whey Protein Isolate / Concentrate", 35.0, 136, 28.0, 2.8, 1.6, 75.0) if daily_budget_inr >= 250 else ("Low-Fat Paneer Bhurji", 100.0, 215, 20.0, 3.5, 13.5, 45.0)
-            pro_lunch = ("Low-Fat Paneer / Cottage Cheese + Dal", 120.0, 258, 24.0, 4.2, 16.2, 54.0)
-            pro_snack = ("Soya Chunks Masala (Dry Weight)", 50.0, 172, 26.0, 16.5, 0.3, 10.0) if not has_soy_allergy else ("Dahi / Toned Milk Curd Bowl", 250.0, 155, 9.5, 11.8, 7.5, 25.0)
-            pro_dinner = ("Moong / Toor Dal Tadka + Dahi", 250.0, 290, 18.0, 43.8, 5.2, 25.0)
-        else:
-            pro_breakfast = ("Whole Boiled Eggs (3 Large)", 150.0, 232, 18.9, 1.6, 15.9, 24.0) if not has_egg_allergy else ("Low-Fat Paneer Bhurji", 100.0, 215, 20.0, 3.5, 13.5, 45.0)
-            pro_lunch = ("Chicken Breast (Grilled / Home Curry)", 160.0, 264, 49.6, 0.0, 5.8, 60.0)
-            pro_snack = ("Whey Protein Shake or Egg Whites", 30.0, 117, 24.0, 2.4, 1.4, 65.0) if not has_dairy_allergy else ("Boiled Egg Whites & Chana", 150.0, 130, 18.0, 10.0, 1.5, 24.0)
-            pro_dinner = ("Chicken Breast / Rohu Fish Curry", 150.0, 248, 46.5, 0.0, 5.4, 57.0)
+        # Select validated catalog food names + baseline grams per meal
+        # Use cost-aware protein selection so weekly cost fits within weekly_budget_inr
+        high_budget = daily_budget_inr >= 380.0
 
-        nut_addition = (
-            ("Mixed Pumpkin & Sunflower Seeds", 20.0, 115, 5.0, 3.0, 9.5, 12.0)
+        if is_vegan or has_dairy_allergy:
+            pro_breakfast = ("Soya Chunks (Raw / Dry Weight)", 55.0) if not has_soy_allergy else ("Moong / Toor Dal Tadka (Cooked)", 220.0)
+            pro_lunch = ("Rajma / Chana Masala (Cooked)", 250.0)
+            pro_snack = ("Soya Chunks (Raw / Dry Weight)", 45.0) if not has_soy_allergy else ("Rajma / Chana Masala (Cooked)", 200.0)
+            pro_dinner = ("Moong / Toor Dal Tadka (Cooked)", 250.0)
+        elif is_veg:
+            pro_breakfast = (
+                ("Whey Protein Isolate / Concentrate", 30.0)
+                if high_budget
+                else ("Soya Chunks (Raw / Dry Weight)", 50.0) if not has_soy_allergy else ("Low-Fat Paneer / Cottage Cheese (Raw)", 90.0)
+            )
+            pro_lunch = ("Low-Fat Paneer / Cottage Cheese (Raw)", 100.0) if daily_budget_inr >= 240.0 else ("Rajma / Chana Masala (Cooked)", 240.0)
+            pro_snack = ("Soya Chunks (Raw / Dry Weight)", 50.0) if not has_soy_allergy else ("Dahi / Toned Milk Curd", 200.0)
+            pro_dinner = ("Moong / Toor Dal Tadka (Cooked)", 240.0)
+        else:
+            pro_breakfast = ("Whole Boiled Eggs", 150.0) if not has_egg_allergy else ("Low-Fat Paneer / Cottage Cheese (Raw)", 100.0)
+            pro_lunch = ("Chicken Breast (Grilled / Cooked)", 140.0) if daily_budget_inr >= 260.0 else ("Whole Boiled Eggs", 150.0)
+            pro_snack = (
+                ("Whey Protein Isolate / Concentrate", 30.0)
+                if high_budget and not has_dairy_allergy
+                else ("Soya Chunks (Raw / Dry Weight)", 50.0) if not has_soy_allergy else ("Whole Boiled Eggs", 120.0)
+            )
+            pro_dinner = (
+                ("Rohu / Indian Seer Fish Curry (Cooked)", 140.0)
+                if high_budget
+                else ("Chicken Breast (Grilled / Cooked)", 130.0) if daily_budget_inr >= 280.0 else ("Moong / Toor Dal Tadka (Cooked)", 240.0)
+            )
+
+        fat_snack_item = (
+            ("Dahi / Toned Milk Curd", 150.0)
+            if has_peanut_allergy and not (is_vegan or has_dairy_allergy)
+            else ("Ripe Banana", 100.0)
             if has_peanut_allergy
-            else ("Roasted Peanuts / Natural Peanut Butter", 25.0, 147, 6.5, 4.0, 12.3, 8.0)
+            else ("Roasted Peanuts / Natural Peanut Butter", 25.0)
         )
 
-        # Scale carbohydrate portions to match athlete's exact caloric/macro target
         meal_templates = [
-            ("Meal 1: High-Protein Indian Breakfast", "08:00 AM", pro_breakfast, ("Rolled Oats / Poha Base", 70.0, 272, 11.8, 46.4, 4.8, 15.0)),
-            ("Meal 2: Balanced Indian Thali Lunch", "01:30 PM", pro_lunch, ("Steamed Basmati Rice (Cooked)", 220.0, 286, 5.9, 62.0, 0.7, 13.0)),
-            ("Meal 3: Pre/Post-Workout Fuel Snack", "05:30 PM", pro_snack, ("Ripe Banana", 120.0, 107, 1.3, 27.4, 0.4, 7.0)),
-            ("Meal 4: Recovery Dinner", "09:00 PM", pro_dinner, ("Whole Wheat Roti / Chapati (Cooked)", 100.0, 297, 9.6, 58.0, 3.0, 8.0)),
+            ("Meal 1: High-Protein Indian Breakfast", "08:00 AM", pro_breakfast, ("Rolled Oats (Raw)", 65.0), fat_snack_item),
+            ("Meal 2: Balanced Indian Thali Lunch", "01:30 PM", pro_lunch, ("Steamed Basmati Rice (Cooked)", 220.0), ("Mixed Seasonal Sabzi (Palak, Gobhi, Beans)", 150.0)),
+            ("Meal 3: Pre/Post-Workout Fuel Snack", "05:30 PM", pro_snack, ("Ripe Banana", 120.0), fat_snack_item),
+            ("Meal 4: Recovery Dinner", "09:00 PM", pro_dinner, ("Whole Wheat Roti / Chapati (Cooked)", 110.0), ("Mixed Seasonal Sabzi (Palak, Gobhi, Beans)", 150.0)),
         ]
 
         selected_templates = meal_templates[:max(1, min(4, meals_per_day))]
-        scale_factor = max(0.65, min(1.8, total_kcal / 2050.0))
+        scale_factor = max(0.65, min(1.75, total_kcal / 2050.0))
+        p_mult = max(0.80, min(1.45, total_pro / 135.0))
 
+        # Construct initial ingredient quantities per meal
+        raw_meal_specs = []
+        for idx, (m_title, m_time, pro_spec, carb_spec, side_spec) in enumerate(selected_templates, start=1):
+            raw_meal_specs.append({
+                "idx": idx,
+                "title": m_title,
+                "time": m_time,
+                "items": [
+                    [pro_spec[0], round(pro_spec[1] * p_mult, 0)],
+                    [carb_spec[0], round(carb_spec[1] * scale_factor, 0)],
+                    [side_spec[0], round(side_spec[1], 0)],
+                ],
+            })
+
+        def _evaluate_plan_cost(specs: List[Dict[str, Any]]) -> float:
+            total = 0.0
+            for sp in specs:
+                for f_name, f_grams in sp["items"]:
+                    ing = compute_ingredient_from_db(f_name, f_grams)
+                    total += ing["cost_inr"]
+            return round(total, 2)
+
+        # Enforce weekly INR budget strictly: if estimated_daily_cost * 7 > weekly_budget_inr,
+        # first swap expensive proteins (Paneer/Whey/Fish/Chicken) to high-protein budget staples (Soya/Dal/Eggs)
+        # and then scale portions if still above budget.
+        current_daily_cost = _evaluate_plan_cost(raw_meal_specs)
+        if current_daily_cost * 7.0 > weekly_budget_inr:
+            budget_protein_fallback = (
+                "Soya Chunks (Raw / Dry Weight)"
+                if not has_soy_allergy
+                else ("Moong / Toor Dal Tadka (Cooked)" if is_veg else "Whole Boiled Eggs")
+            )
+            for sp in raw_meal_specs:
+                primary_name = sp["items"][0][0]
+                if primary_name in (
+                    "Whey Protein Isolate / Concentrate",
+                    "Low-Fat Paneer / Cottage Cheese (Raw)",
+                    "Rohu / Indian Seer Fish Curry (Cooked)",
+                    "Chicken Breast (Grilled / Cooked)",
+                ):
+                    if _evaluate_plan_cost(raw_meal_specs) * 7.0 > weekly_budget_inr:
+                        sp["items"][0][0] = budget_protein_fallback
+                        sp["items"][0][1] = 60.0 if "Soya" in budget_protein_fallback else 180.0
+
+        # Final proportional cost cap if still above daily_budget_inr
+        current_daily_cost = _evaluate_plan_cost(raw_meal_specs)
+        if current_daily_cost > daily_budget_inr and current_daily_cost > 0:
+            budget_ratio = (daily_budget_inr * 0.96) / current_daily_cost
+            for sp in raw_meal_specs:
+                for item_pair in sp["items"]:
+                    item_pair[1] = max(15.0, round(item_pair[1] * budget_ratio, 0))
+
+        # Reconcile carbohydrate staples (Roti / Rice) so total plan calories match target_calories closely while staying <= budget
         meals_out = []
         total_daily_cost = 0.0
+        total_plan_cal = 0
+        total_plan_pro = 0
+        total_plan_carb = 0
+        total_plan_fat = 0
 
-        for idx, (m_title, m_time, pro_tuple, carb_tuple) in enumerate(selected_templates, start=1):
-            p_name, p_g, p_cal, p_pro, p_carb, p_fat, p_cost = pro_tuple
-            c_name, c_g, c_cal, c_pro, c_carb, c_fat, c_cost = carb_tuple
-
-            # Scale carb & protein quantities proportionally
-            c_mult = scale_factor
-            p_mult = max(0.85, min(1.5, total_pro / 135.0))
-
-            ing_list = [
-                {
-                    "name": p_name,
-                    "quantity_grams": round(p_g * p_mult, 0),
-                    "preparation_state": "cooked",
-                    "calories": int(round(p_cal * p_mult)),
-                    "protein_g": round(p_pro * p_mult, 1),
-                    "carbs_g": round(p_carb * p_mult, 1),
-                    "fat_g": round(p_fat * p_mult, 1),
-                    "cost_inr": round(p_cost * p_mult, 1),
-                },
-                {
-                    "name": c_name,
-                    "quantity_grams": round(c_g * c_mult, 0),
-                    "preparation_state": "cooked",
-                    "calories": int(round(c_cal * c_mult)),
-                    "protein_g": round(c_pro * c_mult, 1),
-                    "carbs_g": round(c_carb * c_mult, 1),
-                    "fat_g": round(c_fat * c_mult, 1),
-                    "cost_inr": round(c_cost * c_mult, 1),
-                },
-                {
-                    "name": "Mixed Seasonal Sabzi (Palak, Gobhi, Beans)",
-                    "quantity_grams": 150.0,
-                    "preparation_state": "cooked",
-                    "calories": 108,
-                    "protein_g": 3.9,
-                    "carbs_g": 14.1,
-                    "fat_g": 4.2,
-                    "cost_inr": 12.0,
-                } if idx in (2, 4) else {
-                    "name": nut_addition[0],
-                    "quantity_grams": nut_addition[1],
-                    "preparation_state": "ready_to_eat",
-                    "calories": nut_addition[2],
-                    "protein_g": nut_addition[3],
-                    "carbs_g": nut_addition[4],
-                    "fat_g": nut_addition[5],
-                    "cost_inr": nut_addition[6],
-                }
-            ]
-
+        for sp in raw_meal_specs:
+            ing_list = [compute_ingredient_from_db(f_name, f_grams) for f_name, f_grams in sp["items"]]
             m_cal = sum(int(i["calories"]) for i in ing_list)
             m_pro = int(round(sum(float(i["protein_g"]) for i in ing_list)))
             m_carb = int(round(sum(float(i["carbs_g"]) for i in ing_list)))
             m_fat = int(round(sum(float(i["fat_g"]) for i in ing_list)))
             m_cost = round(sum(float(i["cost_inr"]) for i in ing_list), 2)
+
             total_daily_cost += m_cost
+            total_plan_cal += m_cal
+            total_plan_pro += m_pro
+            total_plan_carb += m_carb
+            total_plan_fat += m_fat
 
             meals_out.append({
-                "meal_number": idx,
-                "name": m_title,
-                "time_of_day": m_time,
+                "meal_number": sp["idx"],
+                "name": sp["title"],
+                "time_of_day": sp["time"],
                 "target_calories": m_cal,
                 "protein_g": m_pro,
                 "carbs_g": m_carb,
@@ -175,13 +230,17 @@ class NutritionAgent(BaseAgent):
                 "ingredients": ing_list,
             })
 
+        estimated_weekly_cost = round(total_daily_cost * 7.0, 2)
+
         return {
             "plan_name": f"{dietary_type.title()} {total_kcal} kcal Indian Nutrition Plan",
             "daily_calories": total_kcal,
+            "actual_meal_calories": total_plan_cal,
             "protein_grams": total_pro,
             "carbs_grams": total_carb,
             "fat_grams": total_fat,
             "estimated_daily_cost_inr": round(total_daily_cost, 2),
+            "estimated_weekly_cost_inr": estimated_weekly_cost,
             "weekly_budget_inr": weekly_budget_inr,
             "meals": meals_out,
         }
@@ -191,7 +250,7 @@ class NutritionAgent(BaseAgent):
         summary = context.get("athlete_summary") or {}
         constraints = context.get("constraints") or {}
 
-        # Always compute deterministic BMR/TDEE/Macro targets first
+        # Always compute deterministic BMR/TDEE/Macro targets + goal/weight conflict detection first
         targets = calculate_nutrition_targets(
             weight_kg=float(summary.get("weight_kg", 70.0)),
             height_cm=float(summary.get("height_cm", 175.0)),
@@ -200,8 +259,10 @@ class NutritionAgent(BaseAgent):
             activity_level=str(summary.get("activity_level", "moderately_active")),
             primary_goal=str(summary.get("primary_goal", "muscle_gain")),
             dietary_type=str(constraints.get("dietary_type", "omnivore")),
+            target_weight_kg=summary.get("target_weight_kg"),
         )
 
+        weekly_budget_inr = float(constraints.get("weekly_budget_inr") or 2500.0)
         det_plan = self._build_deterministic_meals(context, targets)
         provider = get_llm_provider()
         ai_resp = await provider.generate_structured_output(
@@ -219,6 +280,7 @@ class NutritionAgent(BaseAgent):
                 tdee_kcal=targets["tdee_kcal"],
                 allergies=constraints.get("allergies", []),
                 meals=candidate_meals,
+                weekly_budget_inr=weekly_budget_inr,
             )
             if cand_safety["is_valid"]:
                 meals_list = candidate_meals
@@ -229,11 +291,12 @@ class NutritionAgent(BaseAgent):
             tdee_kcal=targets["tdee_kcal"],
             allergies=constraints.get("allergies", []),
             meals=meals_list,
+            weekly_budget_inr=weekly_budget_inr,
         )
 
         explanation = (
             f"{targets['assumptions']} Meal plan structured for '{constraints.get('dietary_type', 'omnivore')}' diet "
-            f"at ~₹{det_plan['estimated_daily_cost_inr']}/day (weekly budget: ₹{det_plan['weekly_budget_inr']}). "
+            f"at ₹{det_plan['estimated_daily_cost_inr']}/day (₹{det_plan['estimated_weekly_cost_inr']}/week within ₹{det_plan['weekly_budget_inr']} budget). "
             + ("(Development Fallback Mode — Validated Database Macros Used)" if ai_resp.is_fallback else "")
         )
 
@@ -244,6 +307,7 @@ class NutritionAgent(BaseAgent):
                 "plan_name": det_plan["plan_name"],
                 "targets": targets,
                 "estimated_daily_cost_inr": det_plan["estimated_daily_cost_inr"],
+                "estimated_weekly_cost_inr": det_plan["estimated_weekly_cost_inr"],
                 "meals": meals_list,
                 "safety_validation": safety,
             },

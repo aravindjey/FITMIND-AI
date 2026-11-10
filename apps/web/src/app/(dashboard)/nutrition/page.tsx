@@ -139,6 +139,18 @@ export default function NutritionPage() {
         </div>
       )}
 
+      {targets?.goal_conflict_warning && (
+        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+          <div>
+            <span className="font-bold text-amber-200 block mb-0.5">
+              Goal &amp; Target Weight Conflict Adjusted ({targets.effective_regime === 'recomposition_cut' ? 'Recomposition Deficit -15%' : 'Conflict Detected'})
+            </span>
+            <span>{targets.goal_conflict_warning}</span>
+          </div>
+        </div>
+      )}
+
       {/* Deterministic Metabolic & Macro Targets */}
       {targets && (
         <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -156,7 +168,10 @@ export default function NutritionPage() {
               {targets.target_calories} <span className="text-xs font-normal text-gray-400">kcal</span>
             </div>
             <div className="text-[11px] text-gray-500 mt-0.5">
-              Logged Today: {totals.calories} kcal
+              {typeof targets.calorie_adjustment_percent === 'number'
+                ? `${targets.calorie_adjustment_percent > 0 ? '+' : ''}${targets.calorie_adjustment_percent}% vs TDEE • `
+                : ''}
+              Logged: {totals.calories} kcal
             </div>
           </div>
 

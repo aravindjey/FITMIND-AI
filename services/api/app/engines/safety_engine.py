@@ -12,6 +12,7 @@ def validate_nutrition_plan_safety(
     tdee_kcal: int,
     allergies: List[str],
     meals: List[Dict[str, Any]],
+    weekly_budget_inr: float = 0.0,
 ) -> Dict[str, Any]:
     violations: List[str] = []
     warnings: List[str] = []
@@ -27,6 +28,15 @@ def validate_nutrition_plan_safety(
         if deficit_pct > settings.SAFETY_MAX_DAILY_DEFICIT_PERCENT:
             violations.append(
                 f"Caloric deficit ({deficit_pct*100:.1f}%) exceeds maximum configured safe deficit ({settings.SAFETY_MAX_DAILY_DEFICIT_PERCENT*100:.0f}%)."
+            )
+
+    # Check weekly INR food budget constraint (allow 1% rounding tolerance)
+    if weekly_budget_inr and weekly_budget_inr > 0 and meals:
+        daily_cost = sum(float(m.get("estimated_cost_inr", 0.0)) for m in meals)
+        weekly_cost = round(daily_cost * 7.0, 2)
+        if weekly_cost > round(weekly_budget_inr * 1.01, 2):
+            violations.append(
+                f"Estimated weekly meal cost (₹{weekly_cost:.2f}) exceeds configured weekly budget (₹{weekly_budget_inr:.2f})."
             )
 
     # Check meals against allergies

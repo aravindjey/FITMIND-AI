@@ -52,9 +52,19 @@ async def get_nutrition_targets(
             detail="Athlete profile not found. Complete profile or onboarding first."
         )
 
-    goal = profile.goals[0].primary_goal if profile.goals else "general_fitness"
+    active_goal = next((g for g in profile.goals if g.is_active), profile.goals[0] if profile.goals else None)
+    goal = active_goal.primary_goal if active_goal else "general_fitness"
+    target_weight_kg = active_goal.target_weight_kg if active_goal else None
     prefs = profile.training_preferences or {}
     dietary_type = prefs.get("dietary_type", "omnivore")
+
+    nut_res = await db.execute(
+        select(NutritionProfile)
+        .options(selectinload(NutritionProfile.food_preferences))
+        .where(NutritionProfile.athlete_profile_id == profile.id)
+    )
+    nut_profile = nut_res.scalars().first()
+    effective_diet = nut_profile.dietary_type if nut_profile else dietary_type
 
     targets = calculate_nutrition_targets(
         weight_kg=profile.current_weight_kg,
@@ -63,19 +73,16 @@ async def get_nutrition_targets(
         sex=profile.sex,
         activity_level=profile.activity_level,
         primary_goal=goal,
-        dietary_type=dietary_type,
+        dietary_type=effective_diet,
+        target_weight_kg=target_weight_kg,
     )
-
-    nut_res = await db.execute(
-        select(NutritionProfile)
-        .options(selectinload(NutritionProfile.food_preferences))
-        .where(NutritionProfile.athlete_profile_id == profile.id)
-    )
-    nut_profile = nut_res.scalars().first()
 
     return {
         **targets,
-        "dietary_type": nut_profile.dietary_type if nut_profile else dietary_type,
+        "current_weight_kg": profile.current_weight_kg,
+        "target_weight_kg": target_weight_kg,
+        "primary_goal": goal,
+        "dietary_type": effective_diet,
         "weekly_food_budget_inr": nut_profile.weekly_food_budget_amount if nut_profile else prefs.get("weekly_budget_inr", 2500.0),
         "currency_code": nut_profile.currency_code if nut_profile else "INR",
         "meals_per_day": nut_profile.meals_per_day if nut_profile else 4,
@@ -269,6 +276,7 @@ async def get_active_nutrition_plan(
             "carbs_grams": plan.carbs_grams,
             "fat_grams": plan.fat_grams,
             "estimated_daily_cost_inr": plan.estimated_daily_cost_inr,
+            "estimated_weekly_cost_inr": round((plan.estimated_daily_cost_inr or 0.0) * 7.0, 2),
             "weekly_budget_inr": nut_profile.weekly_food_budget_amount,
             "currency_code": nut_profile.currency_code,
             "dietary_type": nut_profile.dietary_type,

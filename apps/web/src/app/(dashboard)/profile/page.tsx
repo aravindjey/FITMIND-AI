@@ -230,6 +230,46 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {(() => {
+          const curW = Number(formData.current_weight_kg);
+          const tgtW = Number(formData.target_weight_kg);
+          const goal = formData.primary_goal;
+          const isMassGoalWithLowerTarget =
+            ['muscle_gain', 'bodybuilding', 'strength', 'powerlifting'].includes(goal) &&
+            tgtW > 0 &&
+            curW - tgtW > 1.0;
+          const isFatLossWithHigherTarget =
+            goal === 'fat_loss' && tgtW > 0 && tgtW - curW > 1.0;
+
+          if (isMassGoalWithLowerTarget) {
+            return (
+              <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold text-amber-200 block mb-0.5">
+                    Goal &amp; Target Weight Conflict Detected ({curW} kg → {tgtW} kg with {goal.replace('_', ' ')})
+                  </span>
+                  Your target weight ({tgtW} kg) is {Math.round((curW - tgtW) * 10) / 10} kg below your current weight ({curW} kg). A calorie surplus (+12%) would increase body weight away from {tgtW} kg. The Nutrition Engine will automatically apply a high-protein body-recomposition deficit (-15% below TDEE, 2.1g/kg protein) unless you increase your target weight above {curW} kg or switch your primary goal to Fat Loss.
+                </div>
+              </div>
+            );
+          }
+          if (isFatLossWithHigherTarget) {
+            return (
+              <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold text-amber-200 block mb-0.5">
+                    Goal &amp; Target Weight Conflict Detected ({curW} kg → {tgtW} kg with Fat Loss)
+                  </span>
+                  Your primary goal is Fat Loss, but your target weight ({tgtW} kg) is above your current weight ({curW} kg). Please verify whether you intend to lose fat (set target weight below {curW} kg) or gain lean mass (switch goal to Muscle Gain).
+                </div>
+              </div>
+            );
+          }
+          return null;
+        })()}
+
         <button
           type="submit"
           disabled={saving}

@@ -87,6 +87,35 @@ async def update_profile(
         await repo.create_or_update_goal(athlete_profile_id=profile.id, goal_data=goal_dict)
         await db.refresh(profile)
 
+    # Synchronize NutritionProfile targets when profile or goal changes
+    active_goal_obj = profile.goals[0] if getattr(profile, "goals", None) else None
+    primary_goal = active_goal_obj.primary_goal if active_goal_obj else "general_fitness"
+    target_weight_kg = active_goal_obj.target_weight_kg if active_goal_obj else None
+
+    nut_res = await db.execute(
+        select(NutritionProfile).where(NutritionProfile.athlete_profile_id == profile.id)
+    )
+    nut_profile = nut_res.scalars().first()
+    if nut_profile:
+        targets = calculate_nutrition_targets(
+            weight_kg=profile.current_weight_kg,
+            height_cm=profile.height_cm,
+            age=profile.age,
+            sex=profile.sex,
+            activity_level=profile.activity_level,
+            primary_goal=primary_goal,
+            dietary_type=nut_profile.dietary_type or "omnivore",
+            target_weight_kg=target_weight_kg,
+        )
+        nut_profile.bmr_kcal = targets["bmr_kcal"]
+        nut_profile.tdee_kcal = targets["tdee_kcal"]
+        nut_profile.target_calories = targets["target_calories"]
+        nut_profile.protein_grams = targets["protein_grams"]
+        nut_profile.carbs_grams = targets["carbs_grams"]
+        nut_profile.fat_grams = targets["fat_grams"]
+        await db.commit()
+        await db.refresh(profile)
+
     return AthleteProfileResponse.model_validate(profile)
 
 
@@ -151,6 +180,7 @@ async def complete_onboarding(
         activity_level=onboarding_in.activity_level,
         primary_goal=onboarding_in.primary_goal,
         dietary_type=onboarding_in.dietary_type,
+        target_weight_kg=onboarding_in.target_weight_kg,
     )
 
     nut_res = await db.execute(

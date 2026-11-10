@@ -19,6 +19,7 @@ class AthleteRepository:
             select(AthleteProfile)
             .options(selectinload(AthleteProfile.goals))
             .where(AthleteProfile.user_id == user_id)
+            .execution_options(populate_existing=True)
         )
         return result.scalars().first()
 

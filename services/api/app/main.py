@@ -18,8 +18,8 @@ app = FastAPI(
     version=settings.VERSION,
     description="Production-Grade Personalized Fitness & Athletic Coaching Platform API",
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
-    docs_url=f"{settings.API_V1_STR}/docs",
-    redoc_url=f"{settings.API_V1_STR}/redoc",
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
 # CORS Middleware
