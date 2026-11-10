@@ -88,11 +88,10 @@ export default function DashboardPage() {
     );
   }
 
-  const profile = state.profile;
-  const goal = state.active_goal;
-  const targets = state.deterministic_targets;
-  const weightTrend = state.weight_trend;
-  const recovery = state.recovery_status;
+  const summary = state.athlete_summary || {};
+  const targets = state.nutrition_targets || {};
+  const weightTrend = state.recent_weight_trend || {};
+  const recovery = state.recent_recovery || null;
   const workoutPlan = state.active_workout_plan;
   const nutritionPlan = state.active_nutrition_plan;
   const prs = state.personal_records || [];
@@ -105,7 +104,7 @@ export default function DashboardPage() {
           <p className="text-sm text-gray-400">
             Authoritative database state • Goal:{' '}
             <span className="text-brand-400 font-medium capitalize">
-              {(goal?.primary_goal || 'general_fitness').replace('_', ' ')}
+              {(summary.primary_goal || 'general_fitness').replace('_', ' ')}
             </span>
           </p>
         </div>
@@ -135,11 +134,14 @@ export default function DashboardPage() {
             <TrendingUp className="w-4 h-4 text-brand-500" />
           </div>
           <div className="text-2xl font-bold text-white">
-            {profile.current_weight_kg} <span className="text-sm font-normal text-gray-400">kg</span>
+            {summary.weight_kg} <span className="text-sm font-normal text-gray-400">kg</span>
           </div>
           <div className="text-xs text-gray-400 mt-1">
-            7d EMA: <span className="text-gray-200 font-medium">{weightTrend?.ema_7d_kg || profile.current_weight_kg} kg</span>
-            {goal?.target_weight_kg ? ` • Target: ${goal.target_weight_kg} kg` : ''}
+            7d EMA:{' '}
+            <span className="text-gray-200 font-medium">
+              {weightTrend.ema_latest_kg || summary.weight_kg} kg
+            </span>
+            {summary.target_weight_kg ? ` • Target: ${summary.target_weight_kg} kg` : ''}
           </div>
         </div>
 
@@ -149,12 +151,12 @@ export default function DashboardPage() {
             <Flame className="w-4 h-4 text-orange-400" />
           </div>
           <div className="text-2xl font-bold text-white">
-            {targets?.target_calories || '—'} <span className="text-sm font-normal text-gray-400">kcal</span>
+            {targets.target_calories || '—'} <span className="text-sm font-normal text-gray-400">kcal</span>
           </div>
           <div className="text-xs text-gray-400 mt-1">
-            P: <span className="text-emerald-400">{targets?.protein_g}g</span> • C:{' '}
-            <span className="text-blue-400">{targets?.carbs_g}g</span> • F:{' '}
-            <span className="text-amber-400">{targets?.fat_g}g</span>
+            P: <span className="text-emerald-400">{targets.protein_grams ?? '—'}g</span> • C:{' '}
+            <span className="text-blue-400">{targets.carbs_grams ?? '—'}g</span> • F:{' '}
+            <span className="text-amber-400">{targets.fat_grams ?? '—'}g</span>
           </div>
         </div>
 
@@ -168,7 +170,7 @@ export default function DashboardPage() {
           </div>
           <div className="text-xs text-gray-400 mt-1 capitalize">
             {recovery
-              ? `${recovery.status.replace('_', ' ')} (${recovery.recommended_intensity_modifier}x load)`
+              ? `${(recovery.status || 'baseline').replace('_', ' ')} (${recovery.intensity_modifier ?? 1.0}x load)`
               : 'Submit check-in to compute readiness'}
           </div>
         </div>
@@ -179,10 +181,10 @@ export default function DashboardPage() {
             <User className="w-4 h-4 text-purple-400" />
           </div>
           <div className="text-2xl font-bold text-white">
-            {targets?.tdee_kcal || '—'} <span className="text-sm font-normal text-gray-400">TDEE</span>
+            {targets.tdee_kcal || '—'} <span className="text-sm font-normal text-gray-400">TDEE</span>
           </div>
           <div className="text-xs text-gray-400 mt-1">
-            BMR: {targets?.bmr_kcal} kcal • Exp: {profile.training_experience_years} yrs
+            BMR: {targets.bmr_kcal || '—'} kcal • Exp: {summary.training_experience_years} yrs
           </div>
         </div>
       </div>
@@ -213,12 +215,12 @@ export default function DashboardPage() {
                 <div className="p-4 rounded-xl bg-gray-900/80 border border-gray-800">
                   <div className="font-semibold text-white text-sm">{workoutPlan.name}</div>
                   <div className="text-xs text-gray-400 mt-1">
-                    Split: <span className="text-gray-200 uppercase">{workoutPlan.split_type.replace('_', ' ')}</span> •{' '}
-                    {workoutPlan.days_per_week} days/week • Week {workoutPlan.week_number}
+                    Split:{' '}
+                    <span className="text-gray-200 uppercase">
+                      {(workoutPlan.training_split || 'upper_lower').replace('_', ' ')}
+                    </span>{' '}
+                    • {workoutPlan.days_per_week} days/week
                   </div>
-                  {workoutPlan.coach_notes && (
-                    <p className="text-xs text-gray-400 mt-2 line-clamp-2">{workoutPlan.coach_notes}</p>
-                  )}
                 </div>
               </div>
             ) : (
@@ -265,11 +267,12 @@ export default function DashboardPage() {
                 <div className="p-4 rounded-xl bg-gray-900/80 border border-gray-800">
                   <div className="font-semibold text-white text-sm">{nutritionPlan.name}</div>
                   <div className="text-xs text-gray-400 mt-1">
-                    Target: <span className="text-white font-medium">{nutritionPlan.target_calories} kcal</span> (P:{' '}
-                    {nutritionPlan.protein_g}g • C: {nutritionPlan.carbs_g}g • F: {nutritionPlan.fat_g}g)
+                    Target: <span className="text-white font-medium">{nutritionPlan.daily_calories} kcal</span> •{' '}
+                    {nutritionPlan.meal_count} meals/day
                   </div>
                   <div className="text-xs text-emerald-400 mt-1.5">
-                    Est. Weekly Cost: ₹{nutritionPlan.estimated_weekly_cost_inr} INR
+                    Est. Daily Cost: ₹{nutritionPlan.estimated_daily_cost_inr} INR (~₹
+                    {Math.round((nutritionPlan.estimated_daily_cost_inr || 0) * 7)}/week)
                   </div>
                 </div>
               </div>

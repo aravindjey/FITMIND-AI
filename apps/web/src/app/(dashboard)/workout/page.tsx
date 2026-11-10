@@ -50,18 +50,18 @@ export default function WorkoutPage() {
         apiClient.listWorkoutSessions(),
         apiClient.listPersonalRecords(),
       ]);
-      if (activePlanRes?.has_active_plan) {
+      if (activePlanRes?.has_active_plan && activePlanRes.plan) {
         setPlan(activePlanRes.plan);
         if (activePlanRes.plan.days?.length > 0) {
           const day = activePlanRes.plan.days[0];
-          setWorkoutName(day.day_name);
+          setWorkoutName(day.name || `Day ${day.day_number}`);
           if (day.exercises?.length > 0) {
             setSets(
               day.exercises.slice(0, 3).map((ex: any, i: number) => ({
                 exercise_name: ex.exercise_name,
                 set_number: 1,
-                weight_kg: 40 + i * 10,
-                reps_completed: ex.rep_Max || ex.rep_max || 10,
+                weight_kg: ex.prescribed_weight_kg || 40 + i * 10,
+                reps_completed: ex.target_rep_range_max || 10,
                 actual_rpe: ex.target_rpe || 8,
               }))
             );
@@ -88,7 +88,7 @@ export default function WorkoutPage() {
     try {
       const res = await apiClient.generateWorkoutPlan();
       setMessage(
-        `Generated workout plan "${res.plan.name}" (${res.is_fallback ? 'Deterministic Engine Fallback' : 'Live AI Provider'})`
+        `Generated workout plan "${res.plan.name}" (${res.plan.is_fallback ? 'Deterministic Engine Fallback' : 'Live AI Provider'})`
       );
       await loadData();
     } catch (err: any) {
@@ -184,13 +184,13 @@ export default function WorkoutPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-gray-800 pb-4">
             <div>
               <span className="text-xs font-semibold uppercase tracking-wider text-brand-400">
-                Active Program • {plan.split_type.replace('_', ' ')}
+                Active Program • {(plan.training_split || 'upper_lower').replace('_', ' ')}
               </span>
               <h2 className="text-xl font-bold text-white mt-0.5">{plan.name}</h2>
-              {plan.coach_notes && <p className="text-xs text-gray-400 mt-1">{plan.coach_notes}</p>}
+              {plan.description && <p className="text-xs text-gray-400 mt-1">{plan.description}</p>}
             </div>
             <div className="text-xs text-gray-400">
-              {plan.days_per_week} Days/Week • Week {plan.week_number}
+              {plan.days_per_week} Days/Week • {plan.duration_weeks} Weeks
             </div>
           </div>
 
@@ -201,7 +201,7 @@ export default function WorkoutPage() {
                 key={day.id || idx}
                 onClick={() => {
                   setSelectedDayIdx(idx);
-                  setWorkoutName(day.day_name);
+                  setWorkoutName(day.name);
                 }}
                 className={`px-4 py-2 rounded-xl text-xs font-semibold border transition-colors ${
                   selectedDayIdx === idx
@@ -209,7 +209,7 @@ export default function WorkoutPage() {
                     : 'bg-gray-900 border-gray-800 text-gray-400 hover:text-white'
                 }`}
               >
-                Day {idx + 1}: {day.day_name}
+                {day.name} ({day.scheduled_weekday})
               </button>
             ))}
           </div>
@@ -224,6 +224,7 @@ export default function WorkoutPage() {
                     <th className="py-3 px-3">Exercise</th>
                     <th className="py-3 px-3">Working Sets</th>
                     <th className="py-3 px-3">Rep Target</th>
+                    <th className="py-3 px-3">Prescribed Load</th>
                     <th className="py-3 px-3">Target RPE</th>
                     <th className="py-3 px-3">Rest</th>
                     <th className="py-3 px-3">Progression Rule</th>
@@ -232,11 +233,14 @@ export default function WorkoutPage() {
                 <tbody className="divide-y divide-gray-800/60 text-sm">
                   {currentDay.exercises?.map((ex: any, i: number) => (
                     <tr key={i} className="hover:bg-gray-900/40">
-                      <td className="py-3 px-3 text-gray-500">{ex.order_index}</td>
+                      <td className="py-3 px-3 text-gray-500">{ex.order_in_workout}</td>
                       <td className="py-3 px-3 font-medium text-white">{ex.exercise_name}</td>
-                      <td className="py-3 px-3 text-gray-300">{ex.sets}</td>
+                      <td className="py-3 px-3 text-gray-300">{ex.target_sets}</td>
                       <td className="py-3 px-3 text-brand-400 font-medium">
-                        {ex.rep_min}–{ex.rep_max} reps
+                        {ex.target_rep_range_min}–{ex.target_rep_range_max} reps
+                      </td>
+                      <td className="py-3 px-3 text-emerald-400 font-medium">
+                        {ex.prescribed_weight_kg > 0 ? `${ex.prescribed_weight_kg} kg` : 'Bodyweight'}
                       </td>
                       <td className="py-3 px-3 text-amber-400">RPE {ex.target_rpe}</td>
                       <td className="py-3 px-3 text-gray-400">{ex.rest_seconds}s</td>
@@ -401,9 +405,9 @@ export default function WorkoutPage() {
                 <div key={i} className="p-3 rounded-xl bg-gray-900 border border-gray-800 text-xs space-y-1">
                   <div className="font-semibold text-white">{p.exercise_name}</div>
                   <div className="text-emerald-400 font-medium">
-                    Next Load: {p.next_weight_kg} kg ({p.action.replace('_', ' ')})
+                    Next Load: {p.recommended_weight_kg} kg ({(p.progression_action || '').replace('_', ' ')})
                   </div>
-                  <div className="text-gray-400">{p.rationale}</div>
+                  <div className="text-gray-400">{p.reason}</div>
                 </div>
               ))}
             </div>

@@ -85,7 +85,7 @@ export default function SettingsPage() {
             <Cpu className="w-5 h-5 text-brand-400" />
             <h3 className="font-bold text-white">AI Agent Execution Audit Log ({auditLogs.length})</h3>
           </div>
-          <span className="text-xs text-gray-400">Persisted in agent_run_logs</span>
+          <span className="text-xs text-gray-400">Persisted in agent_audit_logs</span>
         </div>
 
         {auditLogs.length > 0 ? (
@@ -96,9 +96,12 @@ export default function SettingsPage() {
                 className="p-3.5 rounded-xl bg-gray-900 border border-gray-800 flex items-center justify-between text-xs"
               >
                 <div>
-                  <div className="font-semibold text-white">{log.agent_name}</div>
+                  <div className="font-semibold text-white">
+                    {log.agent_name} <span className="text-gray-400 font-normal">({log.action})</span>
+                  </div>
                   <div className="text-gray-400">
-                    Model: {log.model_used} • {new Date(log.created_at).toLocaleString()}
+                    {log.output_snapshot?.is_fallback ? 'Deterministic Fallback Engine' : 'Live Provider'} •{' '}
+                    {new Date(log.created_at).toLocaleString()}
                   </div>
                 </div>
                 <div className="text-right">

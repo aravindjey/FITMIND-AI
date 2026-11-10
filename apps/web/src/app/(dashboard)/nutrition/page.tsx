@@ -6,10 +6,7 @@ import {
   Sparkles,
   CheckCircle,
   AlertCircle,
-  Flame,
-  IndianRupee,
   Plus,
-  Info,
 } from 'lucide-react';
 
 export default function NutritionPage() {
@@ -24,7 +21,7 @@ export default function NutritionPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [foodForm, setFoodForm] = useState({
-    food_name: 'Roti / Whole Wheat Chapati',
+    food_name: 'Whole Wheat Roti / Chapati (Cooked)',
     meal_type: 'lunch',
     preparation_state: 'cooked',
     quantity_grams: 150,
@@ -44,8 +41,11 @@ export default function NutritionPage() {
         setPlan(pRes.plan);
       }
       setFoods(fRes || []);
-      if (fRes?.length > 0 && !foodForm.food_name) {
-        setFoodForm((prev) => ({ ...prev, food_name: fRes[0].name }));
+      if (fRes?.length > 0) {
+        setFoodForm((prev) => ({
+          ...prev,
+          food_name: fRes.some((f: any) => f.name === prev.food_name) ? prev.food_name : fRes[0].name,
+        }));
       }
       setDailyLogs(lRes);
     } finally {
@@ -64,7 +64,7 @@ export default function NutritionPage() {
     try {
       const res = await apiClient.generateNutritionPlan();
       setMessage(
-        `Generated meal plan "${res.plan.name}" • Est. Weekly Cost: ₹${res.plan.estimated_weekly_cost_inr} INR`
+        `Generated meal plan "${res.plan.name}" • Est. Daily Cost: ₹${res.plan.estimated_daily_cost_inr} INR`
       );
       await loadData();
     } catch (err: any) {
@@ -103,8 +103,7 @@ export default function NutritionPage() {
     return <div className="p-12 text-center text-gray-400">Loading Nutrition Engine & Indian Staple Database...</div>;
   }
 
-  const targets = targetsData?.targets;
-  const profile = targetsData?.nutrition_profile;
+  const targets = targetsData;
   const totals = dailyLogs?.totals || { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 };
 
   return (
@@ -148,7 +147,7 @@ export default function NutritionPage() {
             <div className="text-lg font-bold text-white mt-1">
               {targets.bmr_kcal} / {targets.tdee_kcal} <span className="text-xs font-normal text-gray-400">kcal</span>
             </div>
-            <div className="text-[11px] text-gray-500 mt-0.5">{targets.formula_used}</div>
+            <div className="text-[11px] text-gray-500 mt-0.5">Mifflin-St Jeor</div>
           </div>
 
           <div className="p-4 bg-dark-800 border border-gray-800 rounded-2xl">
@@ -163,25 +162,27 @@ export default function NutritionPage() {
 
           <div className="p-4 bg-dark-800 border border-gray-800 rounded-2xl">
             <div className="text-[11px] font-semibold uppercase text-gray-400">Protein Target</div>
-            <div className="text-lg font-bold text-emerald-400 mt-1">{targets.protein_g} g</div>
+            <div className="text-lg font-bold text-emerald-400 mt-1">{targets.protein_grams} g</div>
             <div className="text-[11px] text-gray-500 mt-0.5">Logged Today: {totals.protein_g} g</div>
           </div>
 
           <div className="p-4 bg-dark-800 border border-gray-800 rounded-2xl">
             <div className="text-[11px] font-semibold uppercase text-gray-400">Carbs & Fats</div>
             <div className="text-lg font-bold text-white mt-1">
-              {targets.carbs_g}g C / {targets.fat_g}g F
+              {targets.carbs_grams}g C / {targets.fat_grams}g F
             </div>
-            <div className="text-[11px] text-gray-500 mt-0.5">Fiber: {targets.fiber_g}g • Water: {targets.water_liters}L</div>
+            <div className="text-[11px] text-gray-500 mt-0.5">
+              Fiber: {targets.fiber_grams}g • Water: {targets.hydration_liters}L
+            </div>
           </div>
 
           <div className="p-4 bg-dark-800 border border-gray-800 rounded-2xl">
             <div className="text-[11px] font-semibold uppercase text-gray-400">Weekly Food Budget</div>
             <div className="text-lg font-bold text-amber-400 mt-1">
-              ₹{profile?.weekly_food_budget_inr || 2500} <span className="text-xs font-normal text-gray-400">INR</span>
+              ₹{targets.weekly_food_budget_inr || 2500} <span className="text-xs font-normal text-gray-400">INR</span>
             </div>
             <div className="text-[11px] text-gray-500 mt-0.5 capitalize">
-              Diet: {(profile?.dietary_type || 'omnivore').replace('_', ' ')}
+              Diet: {(targets.dietary_type || 'omnivore').replace('_', ' ')}
             </div>
           </div>
         </div>
@@ -196,14 +197,17 @@ export default function NutritionPage() {
                 Active Constraint-Aware Meal Plan
               </span>
               <h2 className="text-xl font-bold text-white mt-0.5">{plan.name}</h2>
-              {plan.coach_notes && <p className="text-xs text-gray-400 mt-1">{plan.coach_notes}</p>}
+              {plan.calculation_assumptions && (
+                <p className="text-xs text-gray-400 mt-1">{plan.calculation_assumptions}</p>
+              )}
             </div>
             <div className="text-right">
               <div className="text-sm font-bold text-emerald-400">
-                Est. Weekly Cost: ₹{plan.estimated_weekly_cost_inr} INR
+                Est. Daily Cost: ₹{plan.estimated_daily_cost_inr} INR (~₹
+                {Math.round((plan.estimated_daily_cost_inr || 0) * 7)}/wk)
               </div>
               <div className="text-xs text-gray-400">
-                {plan.target_calories} kcal • {plan.protein_g}g P • {plan.carbs_g}g C • {plan.fat_g}g F
+                {plan.daily_calories} kcal • {plan.protein_grams}g P • {plan.carbs_grams}g C • {plan.fat_grams}g F
               </div>
             </div>
           </div>
@@ -213,10 +217,12 @@ export default function NutritionPage() {
               <div key={meal.id || idx} className="p-4 rounded-xl bg-gray-900 border border-gray-800 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-[11px] font-semibold uppercase text-brand-400">Meal {meal.meal_order}</span>
-                    <h4 className="font-bold text-white text-sm">{meal.meal_name}</h4>
+                    <span className="text-[11px] font-semibold uppercase text-brand-400">
+                      Meal {meal.meal_number} ({meal.time_of_day})
+                    </span>
+                    <h4 className="font-bold text-white text-sm">{meal.name}</h4>
                   </div>
-                  <div className="text-xs font-semibold text-white">{meal.calories} kcal</div>
+                  <div className="text-xs font-semibold text-white">{meal.target_calories} kcal</div>
                 </div>
                 <div className="text-xs text-gray-400">
                   P: <span className="text-emerald-400">{meal.protein_g}g</span> • C:{' '}
@@ -224,13 +230,13 @@ export default function NutritionPage() {
                   <span className="text-amber-400">{meal.fat_g}g</span> • Cost: ₹{meal.estimated_cost_inr}
                 </div>
                 <div className="space-y-1 pt-1 border-t border-gray-800/80">
-                  {meal.items?.map((item: any, i: number) => (
+                  {meal.ingredients?.map((item: any, i: number) => (
                     <div key={i} className="flex justify-between text-xs text-gray-300">
                       <span>
-                        {item.food_name} ({item.preparation_state})
+                        {item.name} ({item.preparation_state})
                       </span>
                       <span className="text-gray-400">
-                        {item.grams}g • {item.calories} kcal
+                        {item.quantity_grams}g • {item.calories} kcal
                       </span>
                     </div>
                   ))}

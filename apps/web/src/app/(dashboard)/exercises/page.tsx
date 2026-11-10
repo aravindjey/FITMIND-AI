@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api-client';
-import { ListChecks, RefreshCw, Dumbbell } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 
 export default function ExercisesPage() {
   const [exercises, setExercises] = useState<any[]>([]);
@@ -71,7 +71,7 @@ export default function ExercisesPage() {
             <option value="dumbbell">Dumbbell</option>
             <option value="bodyweight">Bodyweight</option>
             <option value="cables">Cables</option>
-            <option value="machines">Machines</option>
+            <option value="machine">Machine</option>
           </select>
         </div>
       </div>
@@ -79,22 +79,21 @@ export default function ExercisesPage() {
       {substitutionResult && (
         <div className="p-5 bg-brand-600/10 border border-brand-500/30 rounded-2xl space-y-2">
           <div className="text-xs font-semibold text-brand-400 uppercase">
-            Biomechanical Substitutes for &ldquo;{substitutionResult.original_exercise}&rdquo; (
-            {substitutionResult.movement_pattern})
+            Biomechanical Substitutes for &ldquo;{substitutionResult.original_exercise}&rdquo;
           </div>
-          {substitutionResult.substitutes?.length > 0 ? (
+          {substitutionResult.substitutions?.length > 0 ? (
             <div className="grid sm:grid-cols-3 gap-3 pt-1">
-              {substitutionResult.substitutes.map((sub: any) => (
+              {substitutionResult.substitutions.map((sub: any) => (
                 <div key={sub.id} className="p-3 rounded-xl bg-gray-900 border border-gray-800 text-xs">
                   <div className="font-semibold text-white">{sub.name}</div>
                   <div className="text-gray-400 mt-0.5 capitalize">
-                    Equipment: {sub.equipment_required} • {sub.primary_muscle}
+                    Equipment: {sub.equipment_required} • {sub.primary_muscle_group}
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-xs text-gray-400">No alternative exercises found for this exact movement pattern.</p>
+            <p className="text-xs text-gray-400">No alternative exercises found for this movement pattern.</p>
           )}
         </div>
       )}
@@ -108,13 +107,13 @@ export default function ExercisesPage() {
               <div>
                 <div className="flex items-center justify-between gap-2">
                   <span className="px-2.5 py-0.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-[11px] font-medium text-brand-400 capitalize">
-                    {ex.primary_muscle}
+                    {ex.primary_muscle_group}
                   </span>
                   <span className="text-[11px] text-gray-500 uppercase">{ex.equipment_required}</span>
                 </div>
                 <h3 className="text-base font-bold text-white mt-2">{ex.name}</h3>
                 <div className="text-xs text-gray-400 mt-1">
-                  Pattern: <span className="text-gray-300">{ex.movement_pattern.replace('_', ' ')}</span>
+                  Pattern: <span className="text-gray-300">{(ex.movement_pattern || '').replace('_', ' ')}</span>
                 </div>
                 {ex.instructions && <p className="text-xs text-gray-400 mt-2 leading-relaxed">{ex.instructions}</p>}
               </div>

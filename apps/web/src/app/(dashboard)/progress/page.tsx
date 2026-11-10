@@ -23,11 +23,11 @@ export default function ProgressPage() {
     waist_cm: 80,
     chest_cm: 100,
     hips_cm: 95,
-    left_arm_cm: 36,
-    right_arm_cm: 36.5,
-    left_thigh_cm: 56,
-    right_thigh_cm: 56,
-    body_fat_percentage_est: 16,
+    shoulders_cm: 118,
+    bicep_left_cm: 36,
+    bicep_right_cm: 36.5,
+    thigh_left_cm: 56,
+    thigh_right_cm: 56,
     notes: '',
   });
 
@@ -61,11 +61,11 @@ export default function ProgressPage() {
         waist_cm: Number(form.waist_cm),
         chest_cm: Number(form.chest_cm),
         hips_cm: Number(form.hips_cm),
-        left_arm_cm: Number(form.left_arm_cm),
-        right_arm_cm: Number(form.right_arm_cm),
-        left_thigh_cm: Number(form.left_thigh_cm),
-        right_thigh_cm: Number(form.right_thigh_cm),
-        body_fat_percentage_est: Number(form.body_fat_percentage_est),
+        shoulders_cm: Number(form.shoulders_cm),
+        bicep_left_cm: Number(form.bicep_left_cm),
+        bicep_right_cm: Number(form.bicep_right_cm),
+        thigh_left_cm: Number(form.thigh_left_cm),
+        thigh_right_cm: Number(form.thigh_right_cm),
         notes: form.notes || undefined,
       });
       setMessage('Body circumference measurements recorded to historical database.');
@@ -84,7 +84,6 @@ export default function ProgressPage() {
   const aiInsight = analytics?.progress_agent_insight;
   const weightSeries = analytics?.weight_series || [];
   const volumeSeries = analytics?.workout_volume_series || [];
-  const prs = analytics?.personal_records || [];
 
   return (
     <div className="space-y-8">
@@ -121,24 +120,21 @@ export default function ProgressPage() {
               Status: {(aiInsight.trajectory_status || 'on_track').replace('_', ' ')}
             </span>
           </div>
-          <p className="text-sm text-gray-200 leading-relaxed">{aiInsight.summary}</p>
+          <p className="text-sm text-gray-200 leading-relaxed">{aiInsight.insight}</p>
           <div className="grid sm:grid-cols-3 gap-4 pt-2 border-t border-gray-800 text-xs">
             <div>
               <span className="text-gray-400">7-Day EMA Weight: </span>
-              <span className="text-white font-semibold">{aiInsight.ema_7d_weight_kg} kg</span>
+              <span className="text-white font-semibold">{aiInsight.ema_weight_kg} kg</span>
             </div>
             <div>
-              <span className="text-gray-400">Weight Delta: </span>
-              <span className="text-white font-semibold">{aiInsight.weight_delta_kg} kg</span>
+              <span className="text-gray-400">Weekly Velocity: </span>
+              <span className="text-white font-semibold">{aiInsight.weekly_rate_kg} kg/wk</span>
             </div>
             <div>
-              <span className="text-gray-400">Recommended Calorie Adjustment: </span>
-              <span className="text-emerald-400 font-semibold">
-                {aiInsight.recommended_calorie_adjustment_kcal} kcal
-              </span>
+              <span className="text-gray-400">Personal Records Achieved: </span>
+              <span className="text-emerald-400 font-semibold">{aiInsight.pr_count} PRs</span>
             </div>
           </div>
-          <p className="text-xs text-gray-400 italic">{aiInsight.coaching_directive}</p>
         </div>
       )}
 
@@ -150,7 +146,7 @@ export default function ProgressPage() {
               <TrendingUp className="w-4 h-4 text-brand-500" />
               <span>Body Weight History ({weightSeries.length} entries)</span>
             </h3>
-            <span className="text-xs text-gray-400">7d EMA: {analytics?.ema_7d_weight_kg || '—'} kg</span>
+            <span className="text-xs text-gray-400">7d EMA: {analytics?.ema_weight_kg || '—'} kg</span>
           </div>
           {weightSeries.length > 0 ? (
             <div className="space-y-2 max-h-60 overflow-y-auto">
@@ -159,9 +155,9 @@ export default function ProgressPage() {
                   key={i}
                   className="p-3 rounded-xl bg-gray-900 border border-gray-800 flex justify-between items-center text-xs"
                 >
-                  <span className="text-gray-400">{new Date(w.date).toLocaleDateString()}</span>
+                  <span className="text-gray-400">{w.date}</span>
                   <span className="font-bold text-white">{w.weight_kg} kg</span>
-                  <span className="text-gray-500 capitalize">{(w.source || 'log').replace('_', ' ')}</span>
+                  <span className="text-gray-500">EMA: {w.ema_kg} kg</span>
                 </div>
               ))}
             </div>
@@ -184,7 +180,7 @@ export default function ProgressPage() {
                 >
                   <div>
                     <div className="font-semibold text-white">{v.workout_name}</div>
-                    <div className="text-gray-500">{new Date(v.date).toLocaleDateString()}</div>
+                    <div className="text-gray-500">{v.date}</div>
                   </div>
                   <div className="text-brand-400 font-bold">{v.total_volume_kg} kg tonnage</div>
                 </div>
@@ -236,12 +232,12 @@ export default function ProgressPage() {
               />
             </div>
             <div>
-              <label className="block text-[11px] font-semibold uppercase text-gray-400 mb-1">Est. Body Fat %</label>
+              <label className="block text-[11px] font-semibold uppercase text-gray-400 mb-1">Shoulders (cm)</label>
               <input
                 type="number"
                 step="0.1"
-                value={form.body_fat_percentage_est}
-                onChange={(e) => setForm({ ...form, body_fat_percentage_est: Number(e.target.value) })}
+                value={form.shoulders_cm}
+                onChange={(e) => setForm({ ...form, shoulders_cm: Number(e.target.value) })}
                 className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-lg text-white text-xs"
               />
             </div>
@@ -250,8 +246,8 @@ export default function ProgressPage() {
               <input
                 type="number"
                 step="0.1"
-                value={form.left_arm_cm}
-                onChange={(e) => setForm({ ...form, left_arm_cm: Number(e.target.value) })}
+                value={form.bicep_left_cm}
+                onChange={(e) => setForm({ ...form, bicep_left_cm: Number(e.target.value) })}
                 className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-lg text-white text-xs"
               />
             </div>
@@ -260,8 +256,8 @@ export default function ProgressPage() {
               <input
                 type="number"
                 step="0.1"
-                value={form.right_arm_cm}
-                onChange={(e) => setForm({ ...form, right_arm_cm: Number(e.target.value) })}
+                value={form.bicep_right_cm}
+                onChange={(e) => setForm({ ...form, bicep_right_cm: Number(e.target.value) })}
                 className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-lg text-white text-xs"
               />
             </div>
@@ -270,8 +266,8 @@ export default function ProgressPage() {
               <input
                 type="number"
                 step="0.1"
-                value={form.left_thigh_cm}
-                onChange={(e) => setForm({ ...form, left_thigh_cm: Number(e.target.value) })}
+                value={form.thigh_left_cm}
+                onChange={(e) => setForm({ ...form, thigh_left_cm: Number(e.target.value) })}
                 className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-lg text-white text-xs"
               />
             </div>
@@ -280,8 +276,8 @@ export default function ProgressPage() {
               <input
                 type="number"
                 step="0.1"
-                value={form.right_thigh_cm}
-                onChange={(e) => setForm({ ...form, right_thigh_cm: Number(e.target.value) })}
+                value={form.thigh_right_cm}
+                onChange={(e) => setForm({ ...form, thigh_right_cm: Number(e.target.value) })}
                 className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-lg text-white text-xs"
               />
             </div>
@@ -306,11 +302,12 @@ export default function ProgressPage() {
               {measurements.map((m: any) => (
                 <div key={m.id} className="p-3.5 rounded-xl bg-gray-900 border border-gray-800 text-xs space-y-1">
                   <div className="flex justify-between font-semibold text-white">
-                    <span>{m.measured_date}</span>
-                    <span className="text-brand-400">Est. BF: {m.body_fat_percentage_est || '—'}%</span>
+                    <span>{m.recorded_at}</span>
+                    <span className="text-brand-400">{m.weight_kg} kg</span>
                   </div>
                   <div className="text-gray-400">
-                    Waist: {m.waist_cm}cm • Chest: {m.chest_cm}cm • Hips: {m.hips_cm}cm • Arms: {m.right_arm_cm}cm
+                    Waist: {m.waist_cm || '—'}cm • Chest: {m.chest_cm || '—'}cm • Hips: {m.hips_cm || '—'}cm • Arms:{' '}
+                    {m.bicep_right_cm || '—'}cm
                   </div>
                 </div>
               ))}

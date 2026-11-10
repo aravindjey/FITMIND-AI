@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api-client';
-import { Camera, Sparkles, ShieldAlert, CheckCircle, AlertCircle } from 'lucide-react';
+import { Camera, Sparkles, ShieldAlert, AlertCircle } from 'lucide-react';
 
 export default function BodyAnalysisPage() {
   const [photos, setPhotos] = useState<any[]>([]);
@@ -166,24 +166,27 @@ export default function BodyAnalysisPage() {
                   Pose: {latestAnalysis.photo_type}
                 </span>
                 <span className="text-gray-400">
-                  Confidence: {latestAnalysis.analysis.confidence_level} • Est. Range:{' '}
-                  {latestAnalysis.analysis.estimated_body_fat_range}
+                  Confidence: {latestAnalysis.analysis.confidence_level} •{' '}
+                  {latestAnalysis.analysis.qualitative_body_composition_range}
                 </span>
               </div>
 
               <div className="p-3.5 rounded-xl bg-gray-900 border border-gray-800 space-y-2">
                 <div className="font-semibold text-white">Qualitative Muscular & Symmetry Observations</div>
                 <ul className="list-disc list-inside text-gray-300 space-y-1">
-                  {latestAnalysis.analysis.qualitative_observations?.map((obs: string, i: number) => (
+                  {latestAnalysis.analysis.muscular_development_notes?.map((obs: string, i: number) => (
                     <li key={i}>{obs}</li>
+                  ))}
+                  {latestAnalysis.analysis.symmetry_notes?.map((obs: string, i: number) => (
+                    <li key={`sym-${i}`}>{obs}</li>
                   ))}
                 </ul>
               </div>
 
-              {latestAnalysis.analysis.symmetry_and_posture_notes && (
+              {latestAnalysis.analysis.posture_observations && (
                 <div className="p-3.5 rounded-xl bg-gray-900 border border-gray-800 space-y-1">
                   <div className="font-semibold text-white">Posture & Alignment Notes</div>
-                  {latestAnalysis.analysis.symmetry_and_posture_notes.map((n: string, i: number) => (
+                  {latestAnalysis.analysis.posture_observations.map((n: string, i: number) => (
                     <p key={i} className="text-gray-300">
                       {n}
                     </p>
@@ -191,8 +194,12 @@ export default function BodyAnalysisPage() {
                 </div>
               )}
 
+              {latestAnalysis.analysis.weight_comparison_note && (
+                <div className="text-emerald-400 font-medium">{latestAnalysis.analysis.weight_comparison_note}</div>
+              )}
+
               <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-200 text-[11px]">
-                {latestAnalysis.analysis.uncertainty_disclaimer || latestAnalysis.uncertainty_disclaimer}
+                {latestAnalysis.analysis.uncertainty_disclaimer}
               </div>
             </div>
           ) : (
@@ -222,7 +229,7 @@ export default function BodyAnalysisPage() {
                 </div>
                 <div className="text-gray-500">{p.taken_at}</div>
                 <div className="text-gray-400 truncate">
-                  Range: {p.analysis?.estimated_body_fat_range || 'Qualitative'}
+                  {p.analysis?.qualitative_body_composition_range || 'Qualitative Record'}
                 </div>
               </div>
             ))}

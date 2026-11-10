@@ -206,7 +206,15 @@ class RecoveryAgent(BaseAgent):
         rec_input = context.get("check_in_metrics") or context.get("recent_recovery") or {}
 
         if "readiness_score" in rec_input and "sleep_hours" not in rec_input:
-            assessment = rec_input
+            assessment = {
+                "readiness_score": rec_input.get("readiness_score", 80),
+                "status": rec_input.get("status", "optimal"),
+                "intensity_modifier": rec_input.get("intensity_modifier", 1.0),
+                "recommendation": rec_input.get(
+                    "recommendation",
+                    "Readiness assessed from recent recovery log; proceed with prescribed working sets.",
+                ),
+            }
         else:
             assessment = calculate_recovery_readiness(
                 sleep_hours=float(rec_input.get("sleep_hours", 7.5)),

@@ -352,11 +352,34 @@ async def get_progress_analytics(
     )
     prs = pr_res.scalars().all()
 
+    runner = AgentRunner(audit_repo=AuditRepository(db))
+    prog_agent = ProgressAgent()
+    prog_out = await runner.run_agent(
+        prog_agent,
+        AgentInputEnvelope(
+            user_id=current_user.id,
+            action="analyze_progress",
+            context_data={
+                "athlete_summary": {
+                    "weight_kg": profile.current_weight_kg,
+                    "primary_goal": profile.goals[0].primary_goal if profile.goals else "general_fitness",
+                },
+                "recent_weight_trend": {
+                    "ema_latest_kg": ema_weights[-1] if ema_weights else profile.current_weight_kg,
+                    "weekly_rate_kg": weekly_rate,
+                },
+                "personal_records": [{"exercise_name": p.exercise_name} for p in prs],
+                "recent_sessions": [{"workout_name": s.workout_name} for s in sessions],
+            },
+        ),
+    )
+
     return {
         "has_profile": True,
         "current_weight_kg": profile.current_weight_kg,
         "ema_weight_kg": ema_weights[-1] if ema_weights else profile.current_weight_kg,
         "weekly_weight_rate_kg": weekly_rate,
+        "progress_agent_insight": prog_out.result_data,
         "weight_series": [
             {
                 "date": b.recorded_at.isoformat(),

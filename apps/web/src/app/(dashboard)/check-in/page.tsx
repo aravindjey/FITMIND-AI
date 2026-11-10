@@ -8,8 +8,6 @@ import {
   CheckCircle,
   AlertCircle,
   HeartPulse,
-  Moon,
-  Droplets,
 } from 'lucide-react';
 
 export default function CheckInPage() {
@@ -22,11 +20,11 @@ export default function CheckInPage() {
 
   const [form, setForm] = useState({
     weight_kg: 72,
-    energy_score: 4,
+    energy_score: 8,
     sleep_hours: 7.5,
-    sleep_quality_score: 4,
-    stress_score: 2,
-    soreness_score: 2,
+    sleep_quality_score: 8,
+    stress_score: 3,
+    soreness_score: 3,
     hydration_liters: 3.0,
     nutrition_adherence_percent: 90,
     workout_completed: true,
@@ -72,8 +70,9 @@ export default function CheckInPage() {
         notes: form.notes || undefined,
       });
       setLatestResult(res);
+      const rec = res.recovery_assessment;
       setMessage(
-        `Daily check-in recorded! Recovery Readiness Score: ${res.readiness?.readiness_score}/100 (${res.readiness?.status.replace('_', ' ')})`
+        `Daily check-in recorded! Recovery Readiness Score: ${rec?.readiness_score}/100 (${(rec?.status || '').replace('_', ' ')})`
       );
       await loadData();
     } catch (err: any) {
@@ -87,7 +86,7 @@ export default function CheckInPage() {
     return <div className="p-12 text-center text-gray-400">Loading Recovery Readiness & Check-Ins...</div>;
   }
 
-  const readiness = latestResult?.readiness || data?.latest_readiness;
+  const readiness = latestResult?.recovery_assessment || data?.latest_recovery;
   const checkIns = data?.check_ins || [];
 
   return (
@@ -115,45 +114,31 @@ export default function CheckInPage() {
 
       {/* Readiness & AI Agent Insights */}
       {readiness && (
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-2 gap-4">
           <div className="p-5 bg-dark-800 border border-emerald-500/30 rounded-2xl space-y-2">
             <div className="flex items-center justify-between text-xs font-semibold uppercase text-emerald-400">
-              <span>Recovery Readiness</span>
+              <span>RecoveryAgent Readiness</span>
               <HeartPulse className="w-4 h-4" />
             </div>
             <div className="text-3xl font-bold text-white">{readiness.readiness_score}/100</div>
             <div className="text-xs text-gray-300 capitalize">
-              Status: <span className="font-semibold text-emerald-400">{readiness.status.replace('_', ' ')}</span> • Load
-              Modifier: {readiness.recommended_intensity_modifier}x
+              Status:{' '}
+              <span className="font-semibold text-emerald-400">
+                {(readiness.status || 'optimal').replace('_', ' ')}
+              </span>{' '}
+              • Load Modifier: {readiness.intensity_modifier}x
             </div>
             <p className="text-xs text-gray-400">{readiness.recommendation}</p>
           </div>
 
-          {latestResult?.recovery_agent_insight && (
-            <div className="p-5 bg-dark-800 border border-gray-800 rounded-2xl space-y-2">
-              <div className="flex items-center justify-between text-xs font-semibold uppercase text-brand-400">
-                <span>RecoveryAgent Autoregulation</span>
-                <Activity className="w-4 h-4" />
-              </div>
-              <div className="text-sm font-semibold text-white">
-                {latestResult.recovery_agent_insight.training_modification}
-              </div>
-              <p className="text-xs text-gray-400">{latestResult.recovery_agent_insight.sleep_protocol}</p>
-            </div>
-          )}
-
-          {latestResult?.lifestyle_agent_insight && (
+          {latestResult?.lifestyle_insights && (
             <div className="p-5 bg-dark-800 border border-gray-800 rounded-2xl space-y-2">
               <div className="flex items-center justify-between text-xs font-semibold uppercase text-purple-400">
-                <span>LifestyleHabitAgent</span>
+                <span>LifestyleHabitAgent ({latestResult.lifestyle_insights.checkin_streak_days}-Day Streak)</span>
                 <Sparkles className="w-4 h-4" />
               </div>
-              <div className="text-xs font-semibold text-white">
-                Hydration Target: {latestResult.lifestyle_agent_insight.daily_water_target_liters}L • NEAT:{' '}
-                {latestResult.lifestyle_agent_insight.daily_step_target} steps
-              </div>
-              <ul className="list-disc list-inside text-xs text-gray-400 space-y-1">
-                {latestResult.lifestyle_agent_insight.priority_habits?.map((h: string, i: number) => (
+              <ul className="list-disc list-inside text-xs text-gray-300 space-y-1">
+                {latestResult.lifestyle_insights.habit_recommendations?.map((h: string, i: number) => (
                   <li key={i}>{h}</li>
                 ))}
               </ul>
@@ -198,63 +183,51 @@ export default function CheckInPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Sleep Quality (1–5)</label>
-              <select
+              <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Sleep Quality (1–10)</label>
+              <input
+                type="number"
+                min={1}
+                max={10}
                 value={form.sleep_quality_score}
                 onChange={(e) => setForm({ ...form, sleep_quality_score: Number(e.target.value) })}
                 className="w-full px-3.5 py-2 bg-gray-900 border border-gray-800 rounded-xl text-white text-sm"
-              >
-                <option value={1}>1 - Very Poor</option>
-                <option value={2}>2 - Restless</option>
-                <option value={3}>3 - Moderate</option>
-                <option value={4}>4 - Good</option>
-                <option value={5}>5 - Deep & Restorative</option>
-              </select>
+              />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Energy Level (1–5)</label>
-              <select
+              <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Energy Level (1–10)</label>
+              <input
+                type="number"
+                min={1}
+                max={10}
                 value={form.energy_score}
                 onChange={(e) => setForm({ ...form, energy_score: Number(e.target.value) })}
                 className="w-full px-3.5 py-2 bg-gray-900 border border-gray-800 rounded-xl text-white text-sm"
-              >
-                <option value={1}>1 - Exhausted</option>
-                <option value={2}>2 - Low Energy</option>
-                <option value={3}>3 - Normal</option>
-                <option value={4}>4 - Strong</option>
-                <option value={5}>5 - Peak Readiness</option>
-              </select>
+              />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Muscle Soreness (1–5)</label>
-              <select
+              <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Muscle Soreness (1–10)</label>
+              <input
+                type="number"
+                min={1}
+                max={10}
                 value={form.soreness_score}
                 onChange={(e) => setForm({ ...form, soreness_score: Number(e.target.value) })}
                 className="w-full px-3.5 py-2 bg-gray-900 border border-gray-800 rounded-xl text-white text-sm"
-              >
-                <option value={1}>1 - Fresh / No DOMS</option>
-                <option value={2}>2 - Mild Tightness</option>
-                <option value={3}>3 - Moderate DOMS</option>
-                <option value={4}>4 - Heavy Soreness</option>
-                <option value={5}>5 - Severe / Needs Recovery</option>
-              </select>
+              />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Life Stress (1–5)</label>
-              <select
+              <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Life Stress (1–10)</label>
+              <input
+                type="number"
+                min={1}
+                max={10}
                 value={form.stress_score}
                 onChange={(e) => setForm({ ...form, stress_score: Number(e.target.value) })}
                 className="w-full px-3.5 py-2 bg-gray-900 border border-gray-800 rounded-xl text-white text-sm"
-              >
-                <option value={1}>1 - Calm & Relaxed</option>
-                <option value={2}>2 - Low Stress</option>
-                <option value={3}>3 - Moderate</option>
-                <option value={4}>4 - High Work/Life Load</option>
-                <option value={5}>5 - Overwhelmed</option>
-              </select>
+              />
             </div>
 
             <div>
@@ -301,11 +274,13 @@ export default function CheckInPage() {
                 <div key={c.id} className="p-3.5 rounded-xl bg-gray-900 border border-gray-800 text-xs space-y-1">
                   <div className="flex justify-between font-semibold text-white">
                     <span>{c.check_in_date}</span>
-                    <span className="text-brand-400">{c.weight_kg} kg</span>
+                    <span className="text-brand-400">
+                      {c.weight_kg} kg (EMA: {c.ema_weight_kg} kg)
+                    </span>
                   </div>
                   <div className="text-gray-400">
-                    Sleep: {c.sleep_hours}h (Q:{c.sleep_quality_score}/5) • Energy: {c.energy_score}/5 • Soreness:{' '}
-                    {c.soreness_score}/5 • Hydration: {c.hydration_liters}L
+                    Sleep: {c.sleep_hours}h (Q:{c.sleep_quality_score}/10) • Energy: {c.energy_score}/10 • Soreness:{' '}
+                    {c.soreness_score}/10 • Hydration: {c.hydration_liters}L
                   </div>
                 </div>
               ))}
