@@ -61,3 +61,39 @@ class AthleteProfileResponse(BaseModel):
     goals: List[GoalSchema] = Field(default_factory=list)
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class OnboardingRequest(BaseModel):
+    # Personal & Biometrics
+    age: int = Field(..., ge=13, le=100)
+    sex: str = Field(..., description="male, female, or other")
+    height_cm: float = Field(..., gt=50, lt=300)
+    current_weight_kg: float = Field(..., gt=20, lt=500)
+    timezone: str = Field(default="Asia/Kolkata")
+    occupation_type: Optional[str] = "Desk / Professional"
+    activity_level: str = Field(default="moderately_active")
+
+    # Goals & Sport
+    primary_goal: str = Field(default="muscle_gain")
+    target_weight_kg: Optional[float] = Field(None, gt=20, lt=500)
+    target_date: Optional[str] = None
+    sport_name: Optional[str] = None
+    sport_position: Optional[str] = None
+
+    # Training Setup
+    training_experience_years: float = Field(default=1.0, ge=0.0, le=70.0)
+    days_per_week: int = Field(default=4, ge=1, le=7)
+    preferred_days: List[str] = Field(default_factory=lambda: ["Mon", "Tue", "Thu", "Fri"])
+    session_duration_minutes: int = Field(default=60, ge=20, le=180)
+    available_equipment: List[str] = Field(default_factory=lambda: ["bodyweight", "dumbbell", "barbell"])
+
+    # Mandatory Pre-Diet Nutrition & Budget Context
+    dietary_type: str = Field(default="omnivore", description="vegetarian, eggetarian, vegan, omnivore, jain, halal")
+    weekly_food_budget_inr: float = Field(default=2500.0, ge=200.0, le=100000.0)
+    currency_code: str = Field(default="INR")
+    meals_per_day: int = Field(default=4, ge=1, le=8)
+    staple_foods: List[str] = Field(default_factory=list)
+    liked_foods: List[str] = Field(default_factory=list)
+    disliked_foods: List[str] = Field(default_factory=list)
+    allergies: List[str] = Field(default_factory=list)
+    avoided_foods: List[str] = Field(default_factory=list)

@@ -1,10 +1,12 @@
 from typing import Optional, Dict, Any
 import uuid
+from datetime import date
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
 from app.models.athlete import AthleteProfile, Goal
+from app.models.progress import BodyMeasurement
 
 
 class AthleteRepository:
@@ -21,7 +23,7 @@ class AthleteRepository:
         return result.scalars().first()
 
     async def create_profile(self, user_id: uuid.UUID, profile_data: Dict[str, Any]) -> AthleteProfile:
-        """Create athlete profile for user."""
+        """Create athlete profile for user and record initial historical weight entry."""
         profile = AthleteProfile(
             user_id=user_id,
             age=profile_data["age"],
@@ -37,19 +39,42 @@ class AthleteRepository:
             training_preferences=profile_data.get("training_preferences", {})
         )
         self.session.add(profile)
+        await self.session.flush()
+
+        # Record initial historical weight snapshot
+        initial_measurement = BodyMeasurement(
+            athlete_profile_id=profile.id,
+            recorded_at=date.today(),
+            weight_kg=float(profile.current_weight_kg),
+            notes="Initial profile weight baseline"
+        )
+        self.session.add(initial_measurement)
+
         await self.session.commit()
         await self.session.refresh(profile)
         return profile
 
     async def update_profile(self, user_id: uuid.UUID, update_data: Dict[str, Any]) -> Optional[AthleteProfile]:
-        """Update existing athlete profile for user."""
+        """Update existing athlete profile for user and preserve historical weight changes."""
         profile = await self.get_by_user_id(user_id)
         if not profile:
             return None
 
+        old_weight = profile.current_weight_kg
+        new_weight = update_data.get("current_weight_kg")
+
         for key, value in update_data.items():
             if value is not None and hasattr(profile, key):
                 setattr(profile, key, value)
+
+        if new_weight is not None and float(new_weight) != float(old_weight):
+            weight_log = BodyMeasurement(
+                athlete_profile_id=profile.id,
+                recorded_at=date.today(),
+                weight_kg=float(new_weight),
+                notes=f"Profile weight updated from {old_weight} kg to {new_weight} kg"
+            )
+            self.session.add(weight_log)
 
         await self.session.commit()
         await self.session.refresh(profile)
