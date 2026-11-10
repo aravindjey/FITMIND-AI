@@ -1,48 +1,6 @@
-# DIVISION OF ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING
-## SCHOOL OF COMPUTER SCIENCE AND TECHNOLOGY
-### Academic Year 2026-2027 – ODD SEMESTER
-### Skill-Based Evaluation Report (III Internal Assessment)
-### for
-### 23AI2011 — SOFTWARE ENGINEERING FOR ARTIFICIAL INTELLIGENCE
-**in partial fulfillment for the award of the degree of**  
-**BACHELOR OF TECHNOLOGY in COMPUTER SCIENCE AND ENGINEERING**  
-**(ARTIFICIAL INTELLIGENCE / ARTIFICIAL INTELLIGENCE & MACHINE LEARNING)**
-
-**Submitted by:**  
-**ARAVIND KJ (Reg. No: ULK23CS7001)**  
-**October 2026**
-
-**KARUNYA INSTITUTE OF TECHNOLOGY AND SCIENCES**  
-*(Declared as Deemed to be University under Sec.3 of the UGC Act, 1956)*  
-*MoE, UGC & AICTE Approved | NAAC A++ Accredited*
-
----
-
-## BONAFIDE CERTIFICATE
-
-This is to certify that the skill-based evaluation report for the course **23AI2011 Software Engineering for Artificial Intelligence** is a bonafide work done during the odd semester of the academic year 2026–2027 by **ARAVIND KJ (ULK23CS7001)** in partial fulfillment of the requirements for the award of the degree of Bachelor of Technology in Computer Science and Engineering (Artificial Intelligence / Artificial Intelligence & Machine Learning) of Karunya Institute of Technology and Sciences.
-
-Submitted for the assessment held on: _____________________
-
-**Signature of Course In-charge**  
-Mr. K. Martin Victor  
-Assistant Professor
-
----
-
-## EVALUATION REPORT
-
-| S. No. | Evaluation Parameter | Max Marks | Marks Secured |
-| :---: | :--- | :---: | :---: |
-| 1. | Software Requirement Specification (SRS) | 10 | |
-| 2. | Design Document | 15 | |
-| 3. | Certification Course | 5 | |
-| 4. | Viva Voce | 10 | |
-| **Total** | | **/40** | |
-
-**Signature of Course In-charge:**  
-Mr. K. Martin Victor  
-Assistant Professor
+# FITMIND AI — SOFTWARE REQUIREMENTS SPECIFICATION & SYSTEM DESIGN REPORT
+### Intelligent Fitness. Science-Driven Results.
+**A Multi-Agent, Deterministic Athlete Coaching Web Platform**
 
 ---
 
@@ -67,19 +25,17 @@ Assistant Professor
    - 4.3 Platform Justification
 5. **Implementation Steps**
    - 5.1 Step-by-Step Engineering Workflow (Steps 1 – 8)
-6. **Certificate**
-   - 6.1 Course Completion Certification
-7. **Results and Outputs**
-   - 7.1 Worked Example: Nutrition Target Calculation (ALG-02)
-   - 7.2 Worked Example: Weight Trend Analysis (ALG-04)
-   - 7.3 Worked Example: Personal Record Detection (ALG-06)
-   - 7.4 Performance Targets & Empirical Test Verification
-   - 7.5 Live Validated API Response Example
-8. **Conclusions**
-   - 8.1 Project Outcome & Key Takeaways
-   - 8.2 Societal Impact & Safety Enhancements
-   - 8.3 Future Scope & Scalability Enhancements
-9. **References**
+6. **Results and Outputs**
+   - 6.1 Worked Example: Nutrition Target Calculation (ALG-02)
+   - 6.2 Worked Example: Weight Trend Analysis (ALG-04)
+   - 6.3 Worked Example: Personal Record Detection (ALG-06)
+   - 6.4 Performance Targets & Empirical Test Verification
+   - 6.5 Live Validated API Response Example
+7. **Conclusions**
+   - 7.1 Project Outcome & Key Takeaways
+   - 7.2 Societal Impact & Safety Enhancements
+   - 7.3 Future Scope & Scalability Enhancements
+8. **References**
 
 ---
 
@@ -582,21 +538,9 @@ Output: Status ('PASSED' | 'REJECTED'), violation_list, warning_list
 
 ---
 
-# 6. Certificate
+# 6. Results and Outputs
 
-### 6.1 Course Completion Certification
-*(Course Completion Certificate placeholder as designated in academic evaluation syllabus)*
-
-**Student Name:** ARAVIND KJ  
-**Register Number:** ULK23CS7001  
-**Course Code & Title:** 23AI2011 Software Engineering for Artificial Intelligence  
-**Certified Competency:** Software Development Lifecycle, AI Agent Systems & Requirements Engineering  
-
----
-
-# 7. Results and Outputs
-
-### 7.1 Worked Example: Nutrition Target Calculation (ALG-02)
+### 6.1 Worked Example: Nutrition Target Calculation (ALG-02)
 
 | Parameter | Mathematical Formulation | Output Value |
 | :--- | :--- | :--- |
@@ -613,7 +557,7 @@ Output: Status ('PASSED' | 'REJECTED'), violation_list, warning_list
 
 ---
 
-### 7.2 Worked Example: Weight Trend Analysis (ALG-04)
+### 6.2 Worked Example: Weight Trend Analysis (ALG-04)
 - **Logged Daily Weights (10 Days over 14-Day Span):** `[83.4, 83.3, 83.5, 83.2, 83.1, 83.2, 83.0, 83.1, 82.9, 83.0]` kg.
 - **7-Day Exponential Moving Average ($\alpha = 0.25$):** Final Smoothed Value = **83.02 kg**.
 - **Calculated Rate of Change:** **-0.22 kg/week** (optimal lean recomposition velocity).
@@ -621,7 +565,7 @@ Output: Status ('PASSED' | 'REJECTED'), violation_list, warning_list
 
 ---
 
-### 7.3 Worked Example: Personal Record Detection (ALG-06)
+### 6.3 Worked Example: Personal Record Detection (ALG-06)
 - **Exercise:** Barbell Bench Press
 - **Logged Set:** $80.0\text{ kg} \times 8\text{ repetitions}$, Actual RPE: $8.0$
 - **Epley 1RM Estimate:** $\text{1RM} = 80.0 \times \left(1 + \frac{8}{30}\right) = \mathbf{101.33\text{ kg}}$
@@ -630,7 +574,7 @@ Output: Status ('PASSED' | 'REJECTED'), violation_list, warning_list
 
 ---
 
-### 7.4 Performance Targets & Empirical Test Verification
+### 6.4 Performance Targets & Empirical Test Verification
 
 | Metric / Parameter | Proposed Acceptance Target | Empirically Measured Result | Verification Status |
 | :--- | :---: | :---: | :---: |
@@ -646,7 +590,7 @@ Output: Status ('PASSED' | 'REJECTED'), violation_list, warning_list
 
 ---
 
-### 7.5 Sample Validated API Response (POST /api/v1/nutrition/generate-plan)
+### 6.5 Sample Validated API Response (POST /api/v1/nutrition/generate-plan)
 ```json
 {
   "has_active_plan": true,
@@ -677,7 +621,7 @@ Output: Status ('PASSED' | 'REJECTED'), violation_list, warning_list
         "estimated_cost_inr": 48.14,
         "ingredients": [
           {"name": "Whole Boiled Eggs", "quantity_grams": 150.0, "calories": 232, "protein_g": 18.9},
-          {"name": "Rolled Oats (Raw)", "quantity_grams": 90.0, "calories": 350, "protein_g": 15.2},
+          {"name": "Rolled Oats (Raw)", "quantity_grams": 350, "protein_g": 15.2},
           {"name": "Roasted Peanuts", "quantity_grams": 27.0, "calories": 153, "protein_g": 7.0}
         ]
       }
@@ -688,19 +632,19 @@ Output: Status ('PASSED' | 'REJECTED'), violation_list, warning_list
 
 ---
 
-# 8. Conclusions
+# 7. Conclusions
 
-### 8.1 Project Outcome & Key Takeaways
+### 7.1 Project Outcome & Key Takeaways
 FITMIND AI demonstrates that personalized athletic conditioning and nutrition systems can achieve high software reliability and clinical safety by **strictly subordinating probabilistic AI language models to deterministic scientific calculation engines and authoritative relational databases**. Key accomplishments include:
 1. **Zero Mathematical Hallucination:** Eliminating arithmetic operations from LLM prompts and enforcing exact database per-100g nutritional lookups.
 2. **Coupled Optimization:** Implementing a multi-pass solver that reconciles conflicting constraints (protein requirements, calorie limits, and ₹ INR budget ceilings) with zero mathematical residual.
 3. **Defense-in-Depth Application Security:** Hardening the application against OWASP Top 10 vulnerabilities, prompt injection attacks, brute-force vectors, and unauthorized cross-tenant data access.
 4. **Verified Multi-Cloud Deployment:** Successfully deploying the complete decoupled stack across Vercel, Render, and Neon at zero financial cost.
 
-### 8.2 Societal Impact & Safety Enhancements
+### 7.2 Societal Impact & Safety Enhancements
 The platform democratizes evidence-based strength and conditioning coaching for athletes who cannot afford personal trainers or clinical dietitians. By embedding automated safety guardrails (absolute calorie floors of 1200 kcal, mandatory allergen filters, set volume caps, and qualitative visual uncertainty notices), FITMIND AI prevents eating disorder triggers and overtraining injuries.
 
-### 8.3 Future Scope & Scalability Enhancements
+### 7.3 Future Scope & Scalability Enhancements
 1. **Semantic Vector RAG:** Integrating `pgvector` hybrid search over peer-reviewed sports science literature (ACSM, ISSN position stands).
 2. **Real-Time Computer Vision Pose Estimation:** Deploying lightweight TensorFlow.js / MediaPipe models for live joint-angle form tracking during exercise execution.
 3. **Automated Wearable Telemetry:** Integrating Apple HealthKit and Google Health Connect for continuous background HRV and sleep stage ingestion.
@@ -708,7 +652,7 @@ The platform democratizes evidence-based strength and conditioning coaching for 
 
 ---
 
-# 9. References
+# 8. References
 
 1. **ISO/IEC/IEEE 29148:2018**, *Systems and software engineering — Life cycle processes — Requirements engineering*, International Organization for Standardization, 2018.
 2. **IEEE Std 1016-2009**, *IEEE Standard for Information Technology — Systems Design — Software Design Descriptions*, IEEE Computer Society, 2009.
