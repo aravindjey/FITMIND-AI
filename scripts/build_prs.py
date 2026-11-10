@@ -646,13 +646,141 @@ The platform democratizes evidence-based strength and conditioning coaching for 
 with open('docs/FITMIND_AI_SRS_DOCUMENT.md', 'w') as f:
     f.write(prs_content)
 
-# 2. Convert to styled HTML
+# 2. Convert to styled HTML with strict chapter page breaks
 lines = prs_content.split('\n')
-html_out = ['<!DOCTYPE html><html><head><meta charset="utf-8"><title>FITMIND AI PRS Report</title><style>@page{size: A4; margin: 20mm;} body{font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11pt; line-height: 1.6; color: #111827; margin: 40px auto; max-width: 900px;} h1{color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 36px; page-break-after: avoid;} h2{color: #1e293b; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-top: 28px; page-break-after: avoid;} h3{color: #334155; margin-top: 22px; page-break-after: avoid;} h4{color: #475569;} table{border-collapse: collapse; width: 100%; margin: 20px 0; font-size: 9.5pt; page-break-inside: avoid;} th, td{border: 1px solid #cbd5e1; padding: 8px 12px; text-align: left; vertical-align: top;} th{background-color: #f1f5f9; font-weight: 600; color: #0f172a;} tr:nth-child(even){background-color: #f8fafc;} pre{background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; overflow-x: auto; font-family: ui-monospace, Menlo, Monaco, monospace; font-size: 9pt; line-height: 1.45; page-break-inside: avoid;} code{font-family: ui-monospace, Menlo, monospace; font-size: 9pt; background: #f1f5f9; padding: 2px 4px; border-radius: 4px;} hr{border: 0; border-top: 1px solid #e2e8f0; margin: 32px 0;} ul, ol{padding-left: 24px; margin: 12px 0;} li{margin-bottom: 6px;}</style></head><body>']
+css_styles = """
+@page {
+    size: A4;
+    margin: 20mm;
+}
+@media print {
+    .page-break {
+        page-break-before: always !important;
+        break-before: page !important;
+        clear: both;
+    }
+    .toc-page {
+        page-break-after: always !important;
+        break-after: page !important;
+    }
+    h1.chapter-title {
+        page-break-before: always !important;
+        break-before: page !important;
+        margin-top: 0 !important;
+        padding-top: 20px !important;
+    }
+    h2, h3, h4 {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+    }
+    table, pre {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.6;
+    color: #111827;
+    margin: 40px auto;
+    max-width: 900px;
+}
+.page-break {
+    page-break-before: always;
+    break-before: page;
+    clear: both;
+}
+.toc-page {
+    page-break-after: always;
+    break-after: page;
+}
+h1 {
+    color: #0f172a;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 8px;
+    margin-top: 36px;
+}
+h1.chapter-title {
+    page-break-before: always;
+    break-before: page;
+    margin-top: 0;
+    padding-top: 25px;
+}
+h2 {
+    color: #1e293b;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 6px;
+    margin-top: 28px;
+    page-break-after: avoid;
+}
+h3 {
+    color: #334155;
+    margin-top: 22px;
+    page-break-after: avoid;
+}
+h4 {
+    color: #475569;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+    font-size: 9.5pt;
+    page-break-inside: avoid;
+}
+th, td {
+    border: 1px solid #cbd5e1;
+    padding: 8px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background-color: #f1f5f9;
+    font-weight: 600;
+    color: #0f172a;
+}
+tr:nth-child(even) {
+    background-color: #f8fafc;
+}
+pre {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-family: ui-monospace, Menlo, Monaco, monospace;
+    font-size: 9pt;
+    line-height: 1.45;
+    page-break-inside: avoid;
+}
+code {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 9pt;
+    background: #f1f5f9;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+hr {
+    border: 0;
+    border-top: 1px solid #e2e8f0;
+    margin: 32px 0;
+}
+ul, ol {
+    padding-left: 24px;
+    margin: 12px 0;
+}
+li {
+    margin-bottom: 6px;
+}
+"""
+
+html_out = ['<!DOCTYPE html><html><head><meta charset="utf-8"><title>FITMIND AI PRS Report</title><style>' + css_styles + '</style></head><body>']
 
 in_table = False
 in_code = False
 table_header = True
+in_toc = False
 
 for line in lines:
     if line.startswith('```'):
@@ -670,6 +798,14 @@ for line in lines:
         
     stripped = line.strip()
     
+    # Table of contents start
+    if line.startswith('# TABLE OF CONTENTS'):
+        html_out.append('<div class="toc-page">')
+        html_out.append(f'<h1>{html.escape(line[2:])}</h1>')
+        in_toc = True
+        continue
+        
+    # Table parsing
     if stripped.startswith('|') and stripped.endswith('|'):
         cells = [c.strip() for c in stripped[1:-1].split('|')]
         if all(re.match(r'^:?-+:?$', c) for c in cells):
@@ -689,6 +825,9 @@ for line in lines:
         if in_table:
             html_out.append('</table>')
             in_table = False
+            if in_toc:
+                html_out.append('</div>')
+                in_toc = False
             
     if not stripped:
         html_out.append('<p></p>')
@@ -698,9 +837,17 @@ for line in lines:
         html_out.append('<hr/>')
         continue
         
-    if line.startswith('# '):
+    # Main chapter headings (1. Introduction, 2. Problem Definition, etc.)
+    # Match pattern '# N. ' where N is 1 to 10
+    if re.match(r'^#\s+\d+\.\s+', line):
+        html_out.append(f'<br style="page-break-before: always; clear: both;" />')
+        html_out.append(f'<div class="page-break"></div>')
+        html_out.append(f'<h1 class="chapter-title">{html.escape(line[2:])}</h1>')
+        continue
+    elif line.startswith('# '):
         html_out.append(f'<h1>{html.escape(line[2:])}</h1>')
         continue
+        
     if line.startswith('## '):
         html_out.append(f'<h2>{html.escape(line[3:])}</h2>')
         continue
@@ -724,6 +871,8 @@ if in_table:
     html_out.append('</table>')
 if in_code:
     html_out.append('</pre>')
+if in_toc:
+    html_out.append('</div>')
     
 html_out.append('</body></html>')
 
@@ -739,4 +888,4 @@ with open('FITMIND_AI_SRS_DOCUMENT.html', 'w') as f:
 subprocess.run(['textutil', '-convert', 'docx', 'docs/FITMIND_AI_SRS_DOCUMENT.html', '-output', 'docs/FITMIND_AI_PRS_REPORT.docx'])
 subprocess.run(['cp', 'docs/FITMIND_AI_PRS_REPORT.docx', 'FITMIND_AI_PRS_REPORT.docx'])
 
-print('SUCCESS: All files rebuilt perfectly!')
+print('SUCCESS: Chapter page breaks and TOC isolation configured!')

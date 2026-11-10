@@ -1,4 +1,130 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>FITMIND AI PRS Report</title><style>@page{size: A4; margin: 20mm;} body{font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11pt; line-height: 1.6; color: #111827; margin: 40px auto; max-width: 900px;} h1{color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 36px; page-break-after: avoid;} h2{color: #1e293b; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-top: 28px; page-break-after: avoid;} h3{color: #334155; margin-top: 22px; page-break-after: avoid;} h4{color: #475569;} table{border-collapse: collapse; width: 100%; margin: 20px 0; font-size: 9.5pt; page-break-inside: avoid;} th, td{border: 1px solid #cbd5e1; padding: 8px 12px; text-align: left; vertical-align: top;} th{background-color: #f1f5f9; font-weight: 600; color: #0f172a;} tr:nth-child(even){background-color: #f8fafc;} pre{background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; overflow-x: auto; font-family: ui-monospace, Menlo, Monaco, monospace; font-size: 9pt; line-height: 1.45; page-break-inside: avoid;} code{font-family: ui-monospace, Menlo, monospace; font-size: 9pt; background: #f1f5f9; padding: 2px 4px; border-radius: 4px;} hr{border: 0; border-top: 1px solid #e2e8f0; margin: 32px 0;} ul, ol{padding-left: 24px; margin: 12px 0;} li{margin-bottom: 6px;}</style></head><body>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>FITMIND AI PRS Report</title><style>
+@page {
+    size: A4;
+    margin: 20mm;
+}
+@media print {
+    .page-break {
+        page-break-before: always !important;
+        break-before: page !important;
+        clear: both;
+    }
+    .toc-page {
+        page-break-after: always !important;
+        break-after: page !important;
+    }
+    h1.chapter-title {
+        page-break-before: always !important;
+        break-before: page !important;
+        margin-top: 0 !important;
+        padding-top: 20px !important;
+    }
+    h2, h3, h4 {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+    }
+    table, pre {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.6;
+    color: #111827;
+    margin: 40px auto;
+    max-width: 900px;
+}
+.page-break {
+    page-break-before: always;
+    break-before: page;
+    clear: both;
+}
+.toc-page {
+    page-break-after: always;
+    break-after: page;
+}
+h1 {
+    color: #0f172a;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 8px;
+    margin-top: 36px;
+}
+h1.chapter-title {
+    page-break-before: always;
+    break-before: page;
+    margin-top: 0;
+    padding-top: 25px;
+}
+h2 {
+    color: #1e293b;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 6px;
+    margin-top: 28px;
+    page-break-after: avoid;
+}
+h3 {
+    color: #334155;
+    margin-top: 22px;
+    page-break-after: avoid;
+}
+h4 {
+    color: #475569;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+    font-size: 9.5pt;
+    page-break-inside: avoid;
+}
+th, td {
+    border: 1px solid #cbd5e1;
+    padding: 8px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background-color: #f1f5f9;
+    font-weight: 600;
+    color: #0f172a;
+}
+tr:nth-child(even) {
+    background-color: #f8fafc;
+}
+pre {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-family: ui-monospace, Menlo, Monaco, monospace;
+    font-size: 9pt;
+    line-height: 1.45;
+    page-break-inside: avoid;
+}
+code {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 9pt;
+    background: #f1f5f9;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+hr {
+    border: 0;
+    border-top: 1px solid #e2e8f0;
+    margin: 32px 0;
+}
+ul, ol {
+    padding-left: 24px;
+    margin: 12px 0;
+}
+li {
+    margin-bottom: 6px;
+}
+</style></head><body>
+<div class="toc-page">
 <h1>TABLE OF CONTENTS</h1>
 <p></p>
 <table>
@@ -14,10 +140,13 @@
 <tr><td><strong>9.</strong></td><td><strong>References</strong></td><td>38</td></tr>
 <tr><td><strong>10.</strong></td><td><strong>Annexure - I: Outcome-Specific Supporting Evidence</strong></td><td>40</td></tr>
 </table>
+</div>
 <p></p>
 <hr/>
 <p></p>
-<h1>1. Introduction</h1>
+<br style="page-break-before: always; clear: both;" />
+<div class="page-break"></div>
+<h1 class="chapter-title">1. Introduction</h1>
 <p></p>
 <h3>1.1 Background &amp; Context</h3>
 <p>The ubiquity of personal computing devices, mobile web frameworks, and cloud-native databases has transformed the delivery of athletic coaching, personal training, and nutritional science. Historically, individuals seeking to improve physical conditioning, achieve muscular hypertrophy, reduce adipose tissue, or prepare for athletic competitions relied on two primary modalities:</p>
@@ -49,7 +178,9 @@
 <p></p>
 <hr/>
 <p></p>
-<h1>2. Problem Definition, Scope and Objectives</h1>
+<br style="page-break-before: always; clear: both;" />
+<div class="page-break"></div>
+<h1 class="chapter-title">2. Problem Definition, Scope and Objectives</h1>
 <p></p>
 <h3>2.1 Problem Definition</h3>
 <p>Modern digital health software and generic generative AI fitness tools suffer from four critical systemic failures:</p>
@@ -92,7 +223,9 @@
 <p></p>
 <hr/>
 <p></p>
-<h1>3. Literature Survey</h1>
+<br style="page-break-before: always; clear: both;" />
+<div class="page-break"></div>
+<h1 class="chapter-title">3. Literature Survey</h1>
 <p></p>
 <h3>3.1 Review of Scientific Literature</h3>
 <p></p>
@@ -121,7 +254,9 @@
 <p></p>
 <hr/>
 <p></p>
-<h1>4. Requirement Analysis</h1>
+<br style="page-break-before: always; clear: both;" />
+<div class="page-break"></div>
+<h1 class="chapter-title">4. Requirement Analysis</h1>
 <p></p>
 <h3>4.1 System Actors &amp; User Classes</h3>
 <p>1. <strong>Athlete (Primary End-User):</strong> Authenticated user logging personal biometric data, executing workout routines, tracking meals, submitting check-in logs, and interacting with the conversational AI coach.</p>
@@ -200,7 +335,9 @@
 <p></p>
 <hr/>
 <p></p>
-<h1>5. Proposed Methodology and System Design</h1>
+<br style="page-break-before: always; clear: both;" />
+<div class="page-break"></div>
+<h1 class="chapter-title">5. Proposed Methodology and System Design</h1>
 <p></p>
 <h3>5.1 System Architecture</h3>
 <p>FITMIND AI is architected as a <strong>Modular Clean Monolith</strong> with strict unidirectional data flow. The architecture decouples the presentation tier, API transport tier, deterministic scientific computation layer, AI multi-agent orchestration layer, and relational persistence tier.</p>
@@ -338,7 +475,9 @@ Output: Reconciled meal plan containing specific ingredients, gram weights, and 
 <p></p>
 <hr/>
 <p></p>
-<h1>6. Implementation</h1>
+<br style="page-break-before: always; clear: both;" />
+<div class="page-break"></div>
+<h1 class="chapter-title">6. Implementation</h1>
 <p></p>
 <h3>6.1 Database Implementation &amp; ORM Entities</h3>
 <p>The data architecture is implemented using <strong>PostgreSQL 16</strong> and <strong>SQLAlchemy 2.0 Async ORM</strong>, managed through declarative schema models and Alembic migrations (alembic/versions/001_initial_schema.py and 002_indian_budget_nutrition.py). The 21 normalized relational tables encompass:</p>
@@ -385,7 +524,9 @@ Output: Reconciled meal plan containing specific ingredients, gram weights, and 
 <p></p>
 <hr/>
 <p></p>
-<h1>7. Results and Discussion</h1>
+<br style="page-break-before: always; clear: both;" />
+<div class="page-break"></div>
+<h1 class="chapter-title">7. Results and Discussion</h1>
 <p></p>
 <h3>7.1 Empirical Test Verification</h3>
 <p>The software platform was validated through automated test execution using pytest and pytest-asyncio. The test suite evaluated database CRUD operations, deterministic calculation engines, safety gatekeepers, rate limiting, and REST API controllers.</p>
@@ -477,7 +618,9 @@ tests/integration/test_orchestrator.py::test_audit_trail_logging_persistence PAS
 <p></p>
 <hr/>
 <p></p>
-<h1>8. Conclusion</h1>
+<br style="page-break-before: always; clear: both;" />
+<div class="page-break"></div>
+<h1 class="chapter-title">8. Conclusion</h1>
 <p></p>
 <h3>8.1 Project Outcome &amp; Key Takeaways</h3>
 <p><strong>FITMIND AI</strong> demonstrates that personalized athletic conditioning, resistance programming, and sports nutrition can achieve production-grade reliability and mathematical safety by strictly subordinating probabilistic generative AI models to authoritative relational databases and deterministic scientific engines. Key engineering accomplishments include:</p>
@@ -497,7 +640,9 @@ tests/integration/test_orchestrator.py::test_audit_trail_logging_persistence PAS
 <p></p>
 <hr/>
 <p></p>
-<h1>9. References</h1>
+<br style="page-break-before: always; clear: both;" />
+<div class="page-break"></div>
+<h1 class="chapter-title">9. References</h1>
 <p></p>
 <p>1. <strong>ISO/IEC/IEEE 29148:2018</strong>, <em>Systems and software engineering — Life cycle processes — Requirements engineering</em>, International Organization for Standardization, Geneva, Switzerland, 2018.</p>
 <p>2. <strong>IEEE Std 1016-2009</strong>, <em>IEEE Standard for Information Technology — Systems Design — Software Design Descriptions</em>, IEEE Computer Society, Piscataway, NJ, 2009.</p>
@@ -519,7 +664,9 @@ tests/integration/test_orchestrator.py::test_audit_trail_logging_persistence PAS
 <p></p>
 <hr/>
 <p></p>
-<h1>10. Annexure - I: Outcome-Specific Supporting Evidence</h1>
+<br style="page-break-before: always; clear: both;" />
+<div class="page-break"></div>
+<h1 class="chapter-title">10. Annexure - I: Outcome-Specific Supporting Evidence</h1>
 <p></p>
 <h3>Annexure I.A: Sample Production API Request &amp; Validated JSON Response</h3>
 <p><strong>Endpoint:</strong> POST /api/v1/nutrition/generate-plan  </p>
