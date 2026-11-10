@@ -222,7 +222,9 @@ export default function NutritionPage() {
                 {Math.round((plan.estimated_daily_cost_inr || 0) * 7)}/wk)
               </div>
               <div className="text-xs text-gray-400">
-                {plan.daily_calories} kcal • {plan.protein_grams}g P • {plan.carbs_grams}g C • {plan.fat_grams}g F
+                Target: {plan.daily_calories} kcal (Meals Total:{' '}
+                {plan.meals?.reduce((sum: number, m: any) => sum + Number(m.target_calories || 0), 0)} kcal) •{' '}
+                {plan.protein_grams}g P • {plan.carbs_grams}g C • {plan.fat_grams}g F
               </div>
             </div>
           </div>

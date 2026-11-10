@@ -165,6 +165,14 @@ class NutritionAgent(BaseAgent):
                     total += ing["cost_inr"]
             return round(total, 2)
 
+        def _evaluate_plan_kcal(specs: List[Dict[str, Any]]) -> int:
+            total = 0
+            for sp in specs:
+                for f_name, f_grams in sp["items"]:
+                    ing = compute_ingredient_from_db(f_name, f_grams)
+                    total += int(ing["calories"])
+            return total
+
         # Enforce weekly INR budget strictly: if estimated_daily_cost * 7 > weekly_budget_inr,
         # first swap expensive proteins (Paneer/Whey/Fish/Chicken) to high-protein budget staples (Soya/Dal/Eggs)
         # and then scale portions if still above budget.
@@ -195,7 +203,49 @@ class NutritionAgent(BaseAgent):
                 for item_pair in sp["items"]:
                     item_pair[1] = max(15.0, round(item_pair[1] * budget_ratio, 0))
 
-        # Reconcile carbohydrate staples (Roti / Rice) so total plan calories match target_calories closely while staying <= budget
+        # Reconcile carbohydrate staples (Oats / Rice / Banana / Roti) so the sum of meal calories
+        # matches total_kcal within integer-gram rounding tolerance (<= 5 kcal) while staying <= daily_budget_inr.
+        for _pass in range(3):
+            current_kcal = _evaluate_plan_kcal(raw_meal_specs)
+            cal_diff = total_kcal - current_kcal
+            if abs(cal_diff) <= 3:
+                break
+
+            per_meal_cal_delta = cal_diff / float(len(raw_meal_specs))
+            for sp in raw_meal_specs:
+                c_name, c_grams = sp["items"][1]
+                c_item = FOOD_CATALOG_BY_NAME[c_name]
+                kcal_per_g = c_item["calories_per_100g"] / 100.0
+                cost_per_g = c_item["estimated_cost_inr_per_100g"] / 100.0
+                if kcal_per_g <= 0:
+                    continue
+
+                desired_delta_g = round(per_meal_cal_delta / kcal_per_g, 0)
+                new_grams = max(20.0, c_grams + desired_delta_g)
+
+                # If increasing grams, ensure we do not breach daily_budget_inr
+                if new_grams > c_grams:
+                    added_cost = (new_grams - c_grams) * cost_per_g
+                    rem_budget = max(0.0, daily_budget_inr - _evaluate_plan_cost(raw_meal_specs))
+                    if added_cost > rem_budget and cost_per_g > 0:
+                        max_affordable_add = round((rem_budget * 0.98) / cost_per_g, 0)
+                        new_grams = c_grams + max(0.0, max_affordable_add)
+
+                sp["items"][1][1] = round(new_grams, 0)
+
+        # Fine-tune single staple (Lunch Rice or Dinner Roti) for any 1-5g integer rounding residual
+        residual_kcal = total_kcal - _evaluate_plan_kcal(raw_meal_specs)
+        if abs(residual_kcal) >= 2 and len(raw_meal_specs) >= 2:
+            tune_sp = raw_meal_specs[1]  # Lunch Rice (1.3 kcal/g, ₹0.06/g)
+            t_name, t_grams = tune_sp["items"][1]
+            t_item = FOOD_CATALOG_BY_NAME[t_name]
+            kcal_per_g = t_item["calories_per_100g"] / 100.0
+            cost_per_g = t_item["estimated_cost_inr_per_100g"] / 100.0
+            delta_g = round(residual_kcal / kcal_per_g, 0)
+            candidate_g = max(20.0, t_grams + delta_g)
+            if candidate_g <= t_grams or (_evaluate_plan_cost(raw_meal_specs) + (candidate_g - t_grams) * cost_per_g) <= daily_budget_inr:
+                tune_sp["items"][1][1] = candidate_g
+
         meals_out = []
         total_daily_cost = 0.0
         total_plan_cal = 0

@@ -170,3 +170,26 @@ Following manual testing of the Athlete Profile, Nutrition Planner, and AI Coach
 
 ### Regression Test Suite Verification
 - Added `services/api/tests/test_cross_module_consistency.py` and executed the full backend test suite: **`20 passed in 1.77s`**.
+
+---
+
+## 10. Post-Audit Targeted Corrections (Meal Calorie Reconciliation & Frontend CSS)
+
+### Correction 1: Meal Calorie Reconciliation (`2896 kcal` vs `2728 kcal` Target $\rightarrow$ `0 kcal` Discrepancy)
+- **Root Cause**: In `NutritionAgent._build_deterministic_meals()` (`services/api/app/agents/nutrition_agent.py`), initial meal portions scaled protein (`p_mult`) and carbohydrates (`scale_factor`) independently while leaving side items unscaled, resulting in `781 + 786 + 510 + 819 = 2896 kcal` (`+168 kcal` above the `2728 kcal` target).
+- **Fix Implemented**:
+  - Added a multi-pass carbohydrate staple reconciliation loop in `_build_deterministic_meals()` (`services/api/app/agents/nutrition_agent.py` lines 206–247) that adjusts the gram weights of each meal's carbohydrate staple (`Rolled Oats (Raw)`, `Steamed Basmati Rice (Cooked)`, `Ripe Banana`, `Whole Wheat Roti / Chapati (Cooked)`) using exact `DEFAULT_FOOD_ITEMS` per-100g densities while respecting `daily_budget_inr`.
+  - Updated the existing `83.0 kg` athlete's active meal plan in `ai_fitness_coach.db`:
+    - **Meal 1 (`High-Protein Indian Breakfast`)**: `738 kcal` (`₹54.88`)
+    - **Meal 2 (`Balanced Indian Thali Lunch`)**: `744 kcal` (`₹96.06`)
+    - **Meal 3 (`Pre/Post-Workout Fuel Snack`)**: `469 kcal` (`₹27.08`)
+    - **Meal 4 (`Recovery Dinner`)**: `777 kcal` (`₹86.40`)
+    - **Total Reconciled Meal Calories**: **`2728 kcal`** vs **`2728 kcal` target (`0 kcal` discrepancy)**
+    - **Total Reconciled Weekly Cost**: **`₹1850.94/week`** (`₹264.42/day` $\le$ `₹2500.00/week` budget)
+  - Updated `apps/web/src/app/(dashboard)/nutrition/page.tsx` to display both `Target: {plan.daily_calories} kcal` and `(Meals Total: {sum} kcal)`.
+
+### Correction 2: Frontend Tailwind CSS Loading on `localhost:3000`
+- **Root Cause**: Running `npm run build` (`next build`) while `npm run dev` (`next dev`) was active overwrote the shared `.next` directory, deleting `.next/static/css/app/layout.css` (which only exists in development mode) and causing `GET http://localhost:3000/_next/static/css/app/layout.css` to return `HTTP 404 Not Found`.
+- **Fix Implemented**:
+  - Updated `apps/web/next.config.mjs` to isolate build output directories by phase (`distDir: phase === 'phase-development-server' ? '.next' : '.next-build'`) and added `.next-build/` to `.gitignore`.
+  - Verified that even after running `npm run build`, `GET http://localhost:3000/_next/static/css/app/layout.css` returns `HTTP 200 OK` (`30,719 bytes`) with all custom Tailwind theme classes (`.bg-dark-900`, `.bg-dark-800`, `.text-brand-400`).
