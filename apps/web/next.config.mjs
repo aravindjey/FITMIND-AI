@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = (phase) => ({
+const nextConfig = {
   reactStrictMode: true,
-  distDir: phase === 'phase-development-server' ? '.next' : '.next-build',
   async headers() {
     return [
       {
@@ -15,6 +14,6 @@ const nextConfig = (phase) => ({
       },
     ];
   },
-});
+};
 
 export default nextConfig;
