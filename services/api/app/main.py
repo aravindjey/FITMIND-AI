@@ -41,17 +41,17 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# Defensive HTTP Security Headers Middleware
-app.add_middleware(SecurityHeadersMiddleware)
-
-# CORS Middleware with explicit methods and headers
+# CORS Middleware with explicit methods and headers (outermost so preflights are handled first)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allow_headers=["Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"],
+    allow_headers=["*"],
 )
+
+# Defensive HTTP Security Headers Middleware
+app.add_middleware(SecurityHeadersMiddleware)
 
 
 @app.exception_handler(Exception)
