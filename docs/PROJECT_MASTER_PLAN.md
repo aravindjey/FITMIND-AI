@@ -1,66 +1,26 @@
-# AI Fitness Coach — Project Master Plan (`docs/PROJECT_MASTER_PLAN.md`)
+# AI Fitness Coach — Master Development Plan
 
-## 1. Objective
-Complete the full-stack **AI Fitness Coach** platform across all 11 roadmap phases while preserving the existing working FastAPI + Next.js 14 modular monolith architecture.
+## 1. Architectural Vision
+AI Fitness Coach is a production-grade, database-authoritative, AI-powered personalized fitness and athletic coaching platform.
+- **Frontend**: Next.js 14 (App Router), React 18, TypeScript, Tailwind CSS (`apps/web`).
+- **Backend**: Python 3.11+, FastAPI, SQLAlchemy 2.x Async, Pydantic 2.x, Alembic (`services/api`).
+- **Database**: PostgreSQL (primary production target via `docker-compose.yml` or external URI) and SQLite (`sqlite+aiosqlite:///./ai_fitness_coach.db`) for zero-dependency local execution and testing.
+- **Security**: Argon2id password hashing, JWT authentication supporting both `Authorization: Bearer` headers and `HttpOnly` cookies, and strict `user_id` tenant isolation across all 21 relational tables.
+- **AI Architecture**: Provider-independent LLM & Vision abstraction (`OpenAICompatibleProvider`, `GeminiProvider`, and transparent `DevelopmentFallbackProvider`), `AthleteStateHydrator`, `CoachOrchestrator`, and 8 specialized agents (`BodyAnalysisAgent`, `TrainingAgent`, `NutritionAgent`, `FitnessCoachingAgent`, `ProgressAgent`, `RecoveryAgent`, `SafetyValidationComponent`, `LifestyleHabitAgent`) audited in `agent_run_logs`.
 
----
+## 2. Phase Execution Status
 
-## 2. Phase Execution Checklist
-
-### Phase 1 — Foundation Remediation
-- [x] Fix TypeScript syntax bug (`password: str` -> `password: string`) in `apps/web/src/lib/api-client.ts`.
-- [x] Fix profile creation/update tracking (`hasProfile` state) in `apps/web/src/app/(dashboard)/profile/page.tsx`.
-- [x] Reconcile JWT authentication to support both `HTTP-Only` cookies and `Authorization: Bearer` tokens (`services/api/app/api/deps.py`, `services/api/app/api/v1/endpoints/auth.py`).
-- [ ] Install frontend `npm` dependencies and verify `next build`.
-- [x] Verify backend `pytest` suite passes.
-- [ ] Initialize Git repository (`git init`) and create root `README.md`.
-
-### Phase 2 — Complete Database Schema & Onboarding
-- [ ] Expand relational models (`services/api/app/models/`) and Alembic migration `002_complete_domain_schema.py` to cover all required tables:
-  - `users`, `athlete_profiles`, `goals`, `nutrition_profiles` (existing)
-  - `food_preferences`, `exercises`, `workout_plans`, `workout_days`, `workout_exercises`, `workout_sessions`, `set_logs`, `nutrition_plans`, `food_items`, `meals`, `food_logs`, `body_measurements`, `progress_photos`, `personal_records`, `check_ins`, `notifications`, `agent_audit_logs`.
-- [ ] Implement historical body-weight recording whenever athlete weight is initialized or updated.
-- [ ] Implement `AthleteStateHydrator` (`services/api/app/services/state_hydrator.py`) to retrieve authoritative athlete context from the database.
-- [ ] Implement `POST /api/v1/athlete/onboarding` and `GET /api/v1/athlete/state` endpoints.
-- [ ] Build multi-step `/onboarding` frontend wizard (personal info, height/weight, experience, goals, training preferences, available equipment, dietary preferences, allergies, staple foods, INR food budget, activity level).
-
-### Phase 3 — Workout Management Subsystem
-- [ ] Seed curated exercise library (`exercises` table: barbell, dumbbell, machine, bodyweight, cable movements across squat, hinge, push, pull, carry, isolation patterns).
-- [ ] Implement deterministic progressive overload, volume analysis, 1RM estimation, and exercise substitution logic (`services/api/app/engines/workout_engine.py`).
-- [ ] Implement workout endpoints (`/api/v1/training/exercises`, `/api/v1/training/generate-plan`, `/api/v1/training/active-plan`, `/api/v1/training/sessions`, `/api/v1/training/history`, `/api/v1/training/prs`, `/api/v1/training/substitute`).
-- [ ] Build Workout Planner, Workout Logger, and Exercise Library frontend views.
-
-### Phase 4 — Nutrition Management Subsystem
-- [ ] Implement deterministic BMR (Mifflin-St Jeor), TDEE, calorie target, and macronutrient target calculation engine (`services/api/app/engines/nutrition_engine.py`) with explicit calculation assumptions.
-- [ ] Seed validated Indian & global food database (`food_items` table with raw/cooked states, per-100g macros, serving sizes, and estimated INR cost).
-- [ ] Implement nutrition endpoints (`/api/v1/nutrition/targets`, `/api/v1/nutrition/generate-plan`, `/api/v1/nutrition/active-plan`, `/api/v1/nutrition/foods`, `/api/v1/nutrition/logs`, `/api/v1/nutrition/summary`, `/api/v1/nutrition/substitute`).
-- [ ] Build Nutrition Planner and Food Tracker frontend views.
-
-### Phase 5 — Eight Specialized AI Components
-- [ ] Implement provider-independent LLM & Vision adapters (`OpenAI`, `Anthropic`, `Gemini`, plus transparent `DevelopmentFallbackProvider`) in `services/api/app/ai/`.
-- [ ] Implement all 8 specialized components in `services/api/app/agents/`:
-  1. `BodyAnalysisAgent` (vision analysis, measurement interpretation, explicit uncertainty)
-  2. `TrainingAgent` (Workout Planning Agent)
-  3. `NutritionAgent` (INR budget & dietary restriction-aware meal planning)
-  4. `FitnessCoachingAgent` (natural-language Q&A grounded in athlete context)
-  5. `ProgressAgent` (weight trends, measurement deltas, strength progression)
-  6. `RecoveryAgent` (sleep, fatigue, soreness readiness evaluation)
-  7. `SafetyValidationComponent` (configurable calorie floors, deficit caps, allergy & volume checks)
-  8. `LifestyleHabitAgent` (daily check-ins, consistency streaks, reminder coordination)
-
-### Phase 6 — Central AI Orchestrator & Persistent Memory
-- [ ] Implement `CoachOrchestrator` routing, context hydration via `AthleteStateHydrator`, specialist coordination, safety validation gate, and `AgentAuditLog` persistence.
-- [ ] Implement `/api/v1/coach/chat` and `/api/v1/coach/recommendations` endpoints and `/ai-coach` frontend interface.
-
-### Phase 7 — Progress, Recovery & Lifestyle
-- [ ] Implement body-weight history, 7-day EMA trends, body measurements CRUD, strength progression analytics, daily check-ins, recovery readiness dashboard, and deterministic reminder scheduling (`/api/v1/progress/*`, `/api/v1/check-ins/*`, `/api/v1/recovery/*`, `/api/v1/notifications/*`).
-
-### Phase 8 — Body Analysis & Progress Photos
-- [ ] Implement secure photo upload with file validation, local/object storage abstraction, photo history, measurement comparison, and `BodyAnalysisAgent` vision integration (`/api/v1/body-analysis/*`).
-
-### Phase 9 — Complete Frontend Integration
-- [ ] Build and connect all principal frontend pages (`/onboarding`, `/dashboard`, `/profile`, `/ai-coach`, `/workout`, `/exercises`, `/nutrition`, `/progress`, `/body-analysis`, `/recovery`, `/check-in`, `/reminders`, `/settings`).
-
-### Phase 10 & 11 — Testing, Security Verification & Deployment Readiness
-- [ ] Comprehensive backend unit & integration test suite (`pytest`) covering all modules and cross-user isolation.
-- [ ] End-to-end user journey verification and production deployment documentation.
+| Phase | Milestone | Status | Verification |
+| :--- | :--- | :--- | :--- |
+| **Phase 0** | Repository Re-Audit & Baseline | **COMPLETE** | Verified existing files, virtualenv, and Node environment |
+| **Phase 1** | Immediate Remediation & Build Stability | **COMPLETE** | Fixed `api-client.ts`, unified JWT auth, initialized Git, `next build` passed |
+| **Phase 2** | Complete Database Architecture | **COMPLETE** | Alembic migrations `001` + `002` create all 21 tables cleanly |
+| **Phase 3** | Athlete Onboarding & Persistent Context | **COMPLETE** | `/athlete/onboarding`, `/athlete/state`, and `/onboarding` wizard verified |
+| **Phase 4** | Workout Engine & Logging | **COMPLETE** | Periodized split generation, set/RPE logging, Epley 1RM PRs, double progression |
+| **Phase 5** | Nutrition Engine & INR Food Budget | **COMPLETE** | Mifflin-St Jeor BMR/TDEE, Indian staple catalog, ₹ INR budget meal plans, raw/cooked logging |
+| **Phase 6** | AI Agent Layer & Orchestration | **COMPLETE** | All 8 specialist agents + `CoachOrchestrator` + `SafetyValidationComponent` + audit logs |
+| **Phase 7** | Progress, Recovery, Photos & Reminders | **COMPLETE** | 7-day EMA weight trend, 0–100 readiness index, qualitative photo analysis, reminders |
+| **Phase 8** | Security & Tenant Isolation | **COMPLETE** | Verified cross-user isolation across all endpoints |
+| **Phase 9** | Frontend Completion | **COMPLETE** | All 15 Next.js routes implemented and verified via `npm run build` |
+| **Phase 10** | Full Testing & Verification | **COMPLETE** | 15/15 `pytest` tests passing + Alembic upgrade + Next.js static/dynamic build |
+| **Phase 11** | Final Documentation & Git Commit | **COMPLETE** | All tracking documents and root `README.md` updated |

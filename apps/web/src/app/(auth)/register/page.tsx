@@ -21,7 +21,7 @@ export default function RegisterPage() {
 
     try {
       await apiClient.register({ full_name: fullName, email, password });
-      router.push('/profile');
+      router.push('/onboarding');
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please try again.');
     } finally {
