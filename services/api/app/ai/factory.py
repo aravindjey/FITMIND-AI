@@ -229,10 +229,12 @@ def get_llm_provider() -> BaseLLMProvider:
             vision_model_name=settings.VISION_MODEL_NAME,
         )
     if provider == "gemini" and settings.GEMINI_API_KEY:
+        model = settings.PRIMARY_MODEL_NAME if not settings.PRIMARY_MODEL_NAME.startswith("gpt") else "gemini-1.5-flash"
+        vision_model = settings.VISION_MODEL_NAME if not settings.VISION_MODEL_NAME.startswith("gpt") else "gemini-1.5-flash"
         return GeminiProvider(
             api_key=settings.GEMINI_API_KEY,
-            model_name=settings.PRIMARY_MODEL_NAME,
-            vision_model_name=settings.VISION_MODEL_NAME,
+            model_name=model,
+            vision_model_name=vision_model,
         )
 
     return DevelopmentFallbackProvider(
@@ -250,10 +252,11 @@ def get_vision_provider() -> BaseVisionProvider:
             vision_model_name=settings.VISION_MODEL_NAME,
         )
     if provider == "gemini" and settings.GEMINI_API_KEY:
+        vision_model = settings.VISION_MODEL_NAME if not settings.VISION_MODEL_NAME.startswith("gpt") else "gemini-1.5-flash"
         return GeminiProvider(
             api_key=settings.GEMINI_API_KEY,
-            model_name=settings.PRIMARY_MODEL_NAME,
-            vision_model_name=settings.VISION_MODEL_NAME,
+            model_name=settings.PRIMARY_MODEL_NAME if not settings.PRIMARY_MODEL_NAME.startswith("gpt") else "gemini-1.5-flash",
+            vision_model_name=vision_model,
         )
 
     return DevelopmentFallbackProvider(
