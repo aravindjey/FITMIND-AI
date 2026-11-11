@@ -154,7 +154,7 @@ class GeminiProvider(BaseLLMProvider, BaseVisionProvider):
             }
         }
         try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
+            async with httpx.AsyncClient(timeout=httpx.Timeout(60.0, connect=15.0)) as client:
                 resp = await client.post(url, headers=headers, json=payload)
                 resp.raise_for_status()
                 body = resp.json()
@@ -201,7 +201,7 @@ class GeminiProvider(BaseLLMProvider, BaseVisionProvider):
             "generationConfig": {"responseMimeType": "application/json"}
         }
         try:
-            async with httpx.AsyncClient(timeout=45.0) as client:
+            async with httpx.AsyncClient(timeout=httpx.Timeout(60.0, connect=15.0)) as client:
                 resp = await client.post(url, headers=headers, json=payload)
                 resp.raise_for_status()
                 body = resp.json()
@@ -232,9 +232,9 @@ def get_llm_provider() -> BaseLLMProvider:
         )
     if provider == "gemini" and settings.GEMINI_API_KEY:
         raw_m = settings.PRIMARY_MODEL_NAME.lower().strip()
-        model = "gemini-3.8-flash" if (raw_m.startswith("gpt") or "1.5" in raw_m or "2.5" in raw_m) else settings.PRIMARY_MODEL_NAME
+        model = settings.PRIMARY_MODEL_NAME if not (raw_m.startswith("gpt") or "3.8" in raw_m) else "gemini-2.5-flash"
         raw_v = settings.VISION_MODEL_NAME.lower().strip()
-        vision_model = "gemini-3.8-flash" if (raw_v.startswith("gpt") or "1.5" in raw_v or "2.5" in raw_v) else settings.VISION_MODEL_NAME
+        vision_model = settings.VISION_MODEL_NAME if not (raw_v.startswith("gpt") or "3.8" in raw_v) else "gemini-2.5-flash"
         return GeminiProvider(
             api_key=settings.GEMINI_API_KEY,
             model_name=model,
@@ -257,9 +257,9 @@ def get_vision_provider() -> BaseVisionProvider:
         )
     if provider == "gemini" and settings.GEMINI_API_KEY:
         raw_m = settings.PRIMARY_MODEL_NAME.lower().strip()
-        model = "gemini-3.8-flash" if (raw_m.startswith("gpt") or "1.5" in raw_m or "2.5" in raw_m) else settings.PRIMARY_MODEL_NAME
+        model = settings.PRIMARY_MODEL_NAME if not (raw_m.startswith("gpt") or "3.8" in raw_m) else "gemini-2.5-flash"
         raw_v = settings.VISION_MODEL_NAME.lower().strip()
-        vision_model = "gemini-3.8-flash" if (raw_v.startswith("gpt") or "1.5" in raw_v or "2.5" in raw_v) else settings.VISION_MODEL_NAME
+        vision_model = settings.VISION_MODEL_NAME if not (raw_v.startswith("gpt") or "3.8" in raw_v) else "gemini-2.5-flash"
         return GeminiProvider(
             api_key=settings.GEMINI_API_KEY,
             model_name=model,

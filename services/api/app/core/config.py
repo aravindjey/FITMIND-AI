@@ -36,8 +36,8 @@ class Settings(BaseSettings):
 
     # AI Configuration (Provider-Independent)
     LLM_PROVIDER: str = "mock"  # mock | openai | anthropic | gemini | ollama
-    PRIMARY_MODEL_NAME: str = "gemini-3.8-flash"
-    VISION_MODEL_NAME: str = "gemini-3.8-flash"
+    PRIMARY_MODEL_NAME: str = "gemini-2.5-flash"
+    VISION_MODEL_NAME: str = "gemini-2.5-flash"
 
     # Optional AI Keys
     OPENAI_API_KEY: Optional[str] = None
