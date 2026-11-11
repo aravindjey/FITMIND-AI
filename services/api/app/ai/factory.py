@@ -231,8 +231,10 @@ def get_llm_provider() -> BaseLLMProvider:
             vision_model_name=settings.VISION_MODEL_NAME,
         )
     if provider == "gemini" and settings.GEMINI_API_KEY:
-        model = settings.PRIMARY_MODEL_NAME if not settings.PRIMARY_MODEL_NAME.startswith("gpt") else "gemini-1.5-flash"
-        vision_model = settings.VISION_MODEL_NAME if not settings.VISION_MODEL_NAME.startswith("gpt") else "gemini-1.5-flash"
+        raw_m = settings.PRIMARY_MODEL_NAME.lower().strip()
+        model = "gemini-3.8-flash" if (raw_m.startswith("gpt") or "1.5" in raw_m or "2.5" in raw_m) else settings.PRIMARY_MODEL_NAME
+        raw_v = settings.VISION_MODEL_NAME.lower().strip()
+        vision_model = "gemini-3.8-flash" if (raw_v.startswith("gpt") or "1.5" in raw_v or "2.5" in raw_v) else settings.VISION_MODEL_NAME
         return GeminiProvider(
             api_key=settings.GEMINI_API_KEY,
             model_name=model,
@@ -254,10 +256,13 @@ def get_vision_provider() -> BaseVisionProvider:
             vision_model_name=settings.VISION_MODEL_NAME,
         )
     if provider == "gemini" and settings.GEMINI_API_KEY:
-        vision_model = settings.VISION_MODEL_NAME if not settings.VISION_MODEL_NAME.startswith("gpt") else "gemini-1.5-flash"
+        raw_m = settings.PRIMARY_MODEL_NAME.lower().strip()
+        model = "gemini-3.8-flash" if (raw_m.startswith("gpt") or "1.5" in raw_m or "2.5" in raw_m) else settings.PRIMARY_MODEL_NAME
+        raw_v = settings.VISION_MODEL_NAME.lower().strip()
+        vision_model = "gemini-3.8-flash" if (raw_v.startswith("gpt") or "1.5" in raw_v or "2.5" in raw_v) else settings.VISION_MODEL_NAME
         return GeminiProvider(
             api_key=settings.GEMINI_API_KEY,
-            model_name=settings.PRIMARY_MODEL_NAME if not settings.PRIMARY_MODEL_NAME.startswith("gpt") else "gemini-1.5-flash",
+            model_name=model,
             vision_model_name=vision_model,
         )
 
