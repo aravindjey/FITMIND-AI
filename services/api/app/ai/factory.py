@@ -124,7 +124,7 @@ class GeminiProvider(BaseLLMProvider, BaseVisionProvider):
     """Provider adapter for Google Gemini REST API via httpx."""
 
     def __init__(self, api_key: str, model_name: str, vision_model_name: str):
-        self.api_key = api_key
+        self.api_key = "".join(api_key.split()) if api_key else ""
         self.model_name = model_name
         self.vision_model_name = vision_model_name
 
@@ -137,9 +137,8 @@ class GeminiProvider(BaseLLMProvider, BaseVisionProvider):
     ) -> StructuredAIResponse[T]:
         start_time = time.time()
         schema_json = json.dumps(response_schema.model_json_schema())
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model_name}:generateContent"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model_name}:generateContent?key={self.api_key}"
         headers = {
-            "x-goog-api-key": self.api_key,
             "Content-Type": "application/json",
         }
         payload = {
@@ -170,6 +169,9 @@ class GeminiProvider(BaseLLMProvider, BaseVisionProvider):
                     execution_time_ms=execution_ms,
                 )
         except Exception as e:
+            logger.error(f"[GEMINI_ERROR] Call failed to {self.model_name}: {type(e).__name__} - {e}")
+            if hasattr(e, "response") and e.response is not None:
+                logger.error(f"[GEMINI_ERROR] Response: {e.response.text}")
             fb = DevelopmentFallbackProvider(reason=f"Gemini API error ({type(e).__name__})")
             return await fb.generate_structured_output(prompt, system_instruction, response_schema, temperature)
 
@@ -182,9 +184,8 @@ class GeminiProvider(BaseLLMProvider, BaseVisionProvider):
         start_time = time.time()
         schema_json = json.dumps(response_schema.model_json_schema())
         b64_img = base64.b64encode(image_bytes).decode("utf-8")
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.vision_model_name}:generateContent"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.vision_model_name}:generateContent?key={self.api_key}"
         headers = {
-            "x-goog-api-key": self.api_key,
             "Content-Type": "application/json",
         }
         payload = {
@@ -215,6 +216,7 @@ class GeminiProvider(BaseLLMProvider, BaseVisionProvider):
                     execution_time_ms=execution_ms,
                 )
         except Exception as e:
+            logger.error(f"[GEMINI_VISION_ERROR] Call failed to {self.vision_model_name}: {type(e).__name__} - {e}")
             fb = DevelopmentFallbackProvider(reason=f"Gemini Vision API error ({type(e).__name__})")
             return await fb.analyze_image_structured(image_bytes, prompt, response_schema)
 
